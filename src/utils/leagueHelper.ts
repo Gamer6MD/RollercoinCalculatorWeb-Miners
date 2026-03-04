@@ -49,7 +49,7 @@ export function getBlockRewardsForLeague(league: LeagueInfo): Record<string, num
     if (!league || !league.currencies) return rewards;
 
     league.currencies.forEach(currency => {
-        let name = currency.name;
+        const name = currency.name;
         const payout = currency.payout;
 
         // Try to get config

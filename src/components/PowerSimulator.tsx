@@ -227,8 +227,8 @@ const PowerSimulator: React.FC<PowerSimulatorProps> = ({
 
         // Total Power = (Games + Miners) * (1 + Bonus%) + Racks + Temp + Freon
         const bonusBase = currentMinerBaseH + gamesH;
-        let currentBoostedPowerH = bonusBase * (1 + currentBonusVal / 100);
-        let currentTotalPowerH = currentBoostedPowerH + rackH + tempH + freonH;
+        const currentBoostedPowerH = bonusBase * (1 + currentBonusVal / 100);
+        const currentTotalPowerH = currentBoostedPowerH + rackH + tempH + freonH;
 
         let addedMinersBaseH = 0;
         let addedMinersBonusVal = 0;
@@ -255,8 +255,8 @@ const PowerSimulator: React.FC<PowerSimulatorProps> = ({
 
         // New Total Power = (Games + AllMiners) * (1 + NewBonus%) + Racks + Temp + Freon
         const newBonusBaseH = newAllMinersH + gamesH;
-        let newBoostedPowerH = newBonusBaseH * (1 + (newTotalBonusPercent / 100));
-        let newTotalPowerH = newBoostedPowerH + rackH + tempH + freonH;
+        const newBoostedPowerH = newBonusBaseH * (1 + (newTotalBonusPercent / 100));
+        const newTotalPowerH = newBoostedPowerH + rackH + tempH + freonH;
 
         const newTotalPower = autoScalePower(newTotalPowerH);
         const powerDiff = newTotalPowerH - currentTotalPowerH;

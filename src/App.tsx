@@ -19,6 +19,7 @@ import { LEAGUE_IMAGES } from './data/leagueImages';
 import { RollercoinUserResponse } from './types/user';
 import DataInputForm from './components/DataInputForm';
 import EarningsTable from './components/EarningsTable';
+import { Helmet } from 'react-helmet-async';
 
 // Lazy load complex components to improve initial load and shorten critical request chains
 const WithdrawTimer = React.lazy(() => import('./components/WithdrawTimer'));
@@ -116,21 +117,12 @@ function App() {
     i18n.changeLanguage(lng);
   };
 
-  // Dynamic SEO: update title, lang, and meta description on language change
+  // Dynamic SEO: update lang on language change
   useEffect(() => {
-    document.title = t('seo.title');
     document.documentElement.lang = i18n.language;
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', t('seo.description'));
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', t('seo.title'));
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', t('seo.description'));
-    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) twitterTitle.setAttribute('content', t('seo.title'));
-    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twitterDesc) twitterDesc.setAttribute('content', t('seo.description'));
-  }, [i18n.language, t]);
+  }, [i18n.language]);
+
+  const currentUrl = `https://buraktemelkaya.github.io/RollercoinCalculatorWeb/?lng=${i18n.language}`;
 
   const [userPower, setUserPower] = useState<HashPower | null>(null);
   const [earnings, setEarnings] = useState<EarningsResult[]>([]);
@@ -236,6 +228,11 @@ function App() {
       let msg = error instanceof Error ? error.message : t('input.errors.parseError');
       if (msg === 'RATE_LIMIT') {
         msg = t('input.errors.tooManyRequests');
+      } else if (msg === 'Failed to fetch') {
+        // Handle generic network fetch failure
+        msg = t('input.fetchUserError', { error: 'Network Data Error / CORS' });
+      } else {
+        msg = t('input.fetchUserError', { error: msg });
       }
       showNotification(msg, 'error');
       throw error;
@@ -601,6 +598,18 @@ function App() {
           />
         </div>
       )}
+
+      {/* SEO Tags */}
+      <Helmet>
+        <title>{t('seo.title')}</title>
+        <meta name="description" content={t('seo.description')} />
+        <link rel="canonical" href={currentUrl} />
+        <meta property="og:title" content={t('seo.title')} />
+        <meta property="og:description" content={t('seo.description')} />
+        <meta property="og:url" content={currentUrl} />
+        <meta name="twitter:title" content={t('seo.title')} />
+        <meta name="twitter:description" content={t('seo.description')} />
+      </Helmet>
 
       {/* Header */}
       <header className="header">

@@ -146,7 +146,7 @@ export function powerRatio(userPower: HashPower, leaguePower: HashPower): number
 export function parsePowerText(text: string): { coins: CoinData[], userPower: HashPower | null } {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
     const coins: CoinData[] = [];
-    let userPower: HashPower | null = null;
+    const userPower: HashPower | null = null;
 
     // Iterate through lines to find patterns
     for (let i = 0; i < lines.length; i++) {

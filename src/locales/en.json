@@ -30,6 +30,7 @@
         "serverDesc": "Get the latest data automatically",
         "apiSuccess": "Market data updated successfully",
         "apiError": "❌ Failed to fetch from API: {{error}}",
+        "fetchUserError": "❌ Failed to fetch user: {{error}}",
         "apiCooldown": "⏳ Please wait {{seconds}}s before fetching again",
         "apiCooldownBtn": "Wait {{seconds}}s",
         "lastFetched": "Last fetched: {{time}}",
