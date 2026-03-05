@@ -69,7 +69,7 @@ function getRewardTypeImage(type: string): string | null {
 function getRewardDisplay(
     reward: ProgressionReward,
     t: (key: string, opts?: Record<string, unknown>) => string
-): { text: string; subText: string; imageUrl?: string; localImage?: string } {
+): { text: string; subText: string; imageUrl?: string; localImage?: string; level?: number } {
     switch (reward.type) {
         case 'power': {
             const durationDays = reward.ttl_time > 0 ? Math.round(reward.ttl_time / 86400000) : 0;
@@ -107,6 +107,7 @@ function getRewardDisplay(
                     text: miner.name.en,
                     subText: `${formatPower(miner.power)} | ${bonusPct}%`,
                     imageUrl: getMinerImageUrl(miner.filename),
+                    level: miner.level,
                 };
             }
             return { text: t('event.rewardTypes.miner'), subText: '' };
@@ -454,7 +455,16 @@ export default function ProgressionEvent() {
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '280px', maxWidth: '100%', margin: '0 auto', textAlign: 'left' }}>
                                                         <div style={{ width: '96px', display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
                                                             {display?.imageUrl ? (
-                                                                <img src={display.imageUrl} alt={display.text} style={{ maxWidth: '96px', maxHeight: '64px', objectFit: 'contain' }} loading="lazy" />
+                                                                <div style={{ position: 'relative', display: 'inline-flex' }}>
+                                                                    {(display?.level ?? 0) > 1 && (
+                                                                        <img
+                                                                            src={`https://rollercoin.com/static/img/storage/rarity_icons/level_${display.level}.png?v=1.0.0`}
+                                                                            alt={`Level ${display.level}`}
+                                                                            style={{ position: 'absolute', top: '0px', left: '0px', width: '22px', height: '14px', objectFit: 'contain', zIndex: 2 }}
+                                                                        />
+                                                                    )}
+                                                                    <img src={display.imageUrl} alt={display.text} style={{ maxWidth: '96px', maxHeight: '64px', objectFit: 'contain' }} loading="lazy" />
+                                                                </div>
                                                             ) : display?.localImage ? (
                                                                 <img src={display.localImage} alt={display.text} style={{ width: '48px', height: '48px', objectFit: 'contain' }} loading="lazy" />
                                                             ) : typeImage ? (
