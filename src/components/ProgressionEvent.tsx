@@ -16,11 +16,12 @@ import {
 import { autoScalePower } from '../utils/powerParser';
 import './ProgressionEvent.css';
 
-// Local item images
 import batteryImg from '../assets/items/battery.png';
 import bonusPowerImg from '../assets/items/bonus_power.png';
 import xpImg from '../assets/items/xp.png';
 import speedupImg from '../assets/items/speedup_item.gif';
+import rstImg from '../assets/coins/rst.svg';
+import rltImg from '../assets/coins/rlt.svg';
 
 type EventTab = 'rewards' | 'multiplier';
 
@@ -55,6 +56,10 @@ function getMinerImageUrl(filename: string): string {
     return `https://static.rollercoin.com/static/img/market/miners/${filename}.gif?v=1`;
 }
 
+function getRackImageUrl(filename: string): string {
+    return `https://static.rollercoin.com/static/img/market/racks/${filename}.gif?v=1`;
+}
+
 // Get local image for known reward types
 function getRewardTypeImage(type: string): string | null {
     switch (type) {
@@ -82,9 +87,16 @@ function getRewardDisplay(
         }
         case 'money': {
             const amount = reward.amount / 1e6;
+            let moneyIcon = undefined;
+            if (reward.currency === 'RST') {
+                moneyIcon = rstImg;
+            } else if (reward.currency === 'RLT') {
+                moneyIcon = rltImg;
+            }
             return {
                 text: `${amount} ${reward.currency}`,
                 subText: `${amount} ${reward.currency}`,
+                localImage: moneyIcon,
             };
         }
         case 'season_pass_xp':
@@ -118,6 +130,7 @@ function getRewardDisplay(
                 return {
                     text: rack.name.en,
                     subText: `Rack Bonus:${rack.capacity * 5}%`,
+                    imageUrl: rack.filename ? getRackImageUrl(rack.filename) : undefined,
                 };
             }
             return { text: t('event.rewardTypes.rack'), subText: '' };

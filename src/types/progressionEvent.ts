@@ -77,6 +77,7 @@ export interface RackItem {
   capacity: number;
   is_can_be_sold_on_mp: boolean;
   is_in_set: boolean;
+  filename?: string;
 }
 
 export interface UtilityItem {

@@ -132,7 +132,7 @@ function App() {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
-  const currentUrl = `https://buraktemelkaya.github.io/RollercoinCalculatorWeb/?lng=${i18n.language}`;
+  const currentUrl = `https://buraktemelkaya.github.io/RollercoinCalculatorWeb/`;
 
   const [userPower, setUserPower] = useState<HashPower | null>(null);
   const [earnings, setEarnings] = useState<EarningsResult[]>([]);
