@@ -52,6 +52,27 @@ body {
   line-height: 1.6;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: var(--radius-md);
+  border: 3px solid var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
 /* App Container */
 .app {
   max-width: 1200px;
@@ -714,6 +735,7 @@ a:hover {
 .main-tabs {
   --tab-gap: 12px;
   --tab-padding: 8px;
+  --tab-count: 3;
   position: relative;
   display: flex;
   gap: var(--tab-gap);
@@ -728,12 +750,22 @@ a:hover {
   z-index: 5;
 }
 
+.main-tabs.main-tabs-4 {
+  --tab-count: 4;
+  max-width: 780px;
+}
+
+.main-tabs.main-tabs-1 {
+  --tab-count: 1;
+  max-width: 260px;
+}
+
 .main-tabs-bg {
   position: absolute;
   top: var(--tab-padding);
   bottom: var(--tab-padding);
   left: var(--tab-padding);
-  width: calc((100% - (var(--tab-padding) * 2) - (var(--tab-gap) * 2)) / 3);
+  width: calc((100% - (var(--tab-padding) * 2) - (var(--tab-gap) * (var(--tab-count) - 1))) / var(--tab-count));
   background: var(--accent-gradient);
   border-radius: var(--radius-md);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -771,6 +803,34 @@ a:hover {
   color: white;
   background: transparent;
   /* Glow/shadow is handled by .main-tabs-bg */
+}
+
+/* Event Link Button (Separate from Tabs) */
+.pe-event-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 48px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pe-event-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+  color: white;
 }
 
 .tab-icon {

@@ -1,0 +1,639 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { fetchProgressionEvent, type ParsedProgressionEvent } from '../services/progressionEventApi';
+import type {
+    ProgressionReward,
+    LevelConfig,
+    MinerItem,
+    RackItem,
+    UtilityItem,
+} from '../types/progressionEvent';
+import {
+    BOX_PRICE_OPTIONS,
+    DISCOUNT_OPTIONS,
+    EVENT_CONSTANTS,
+} from '../types/progressionEvent';
+import { autoScalePower } from '../utils/powerParser';
+import './ProgressionEvent.css';
+
+// Local item images
+import batteryImg from '../assets/items/battery.png';
+import bonusPowerImg from '../assets/items/bonus_power.png';
+import xpImg from '../assets/items/xp.png';
+import speedupImg from '../assets/items/speedup_item.gif';
+
+type EventTab = 'rewards' | 'multiplier';
+
+// Cache for the fetched event data
+const STORAGE_KEY = 'rollercoin_web_progression_event';
+const STORAGE_TIMESTAMP_KEY = 'rollercoin_web_progression_event_ts';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Removed fixed RLT_PRICE constant
+
+/**
+ * Format power value from API (Gh/s) to human-readable string.
+ * API returns power in Gh/s as raw number. We convert to H/s base then auto-scale.
+ */
+function formatPower(powerGhs: number): string {
+    // Convert Gh/s to H/s (base unit), then auto-scale
+    const baseValue = powerGhs * 1e9;
+    const scaled = autoScalePower(baseValue);
+    // Format with thousands separator
+    const formatted = scaled.value.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+    return `${formatted} ${scaled.unit}/s`;
+}
+
+function formatNumber(num: number): string {
+    return Math.ceil(num).toLocaleString('en-US');
+}
+
+function getMinerImageUrl(filename: string): string {
+    return `https://static.rollercoin.com/static/img/market/miners/${filename}.gif?v=1`;
+}
+
+// Get local image for known reward types
+function getRewardTypeImage(type: string): string | null {
+    switch (type) {
+        case 'power': return bonusPowerImg;
+        case 'battery': return batteryImg;
+        case 'season_pass_xp': return xpImg;
+        case 'utility_item': return speedupImg;
+        default: return null;
+    }
+}
+
+function getRewardDisplay(
+    reward: ProgressionReward,
+    t: (key: string, opts?: Record<string, unknown>) => string
+): { text: string; subText: string; imageUrl?: string; localImage?: string } {
+    switch (reward.type) {
+        case 'power': {
+            const durationDays = reward.ttl_time > 0 ? Math.round(reward.ttl_time / 86400000) : 0;
+            const duration = durationDays > 0 ? ` (${durationDays}${t('event.daysShort')})` : '';
+            return {
+                text: t('event.rewardTypes.power'),
+                subText: `${formatPower(reward.amount)}${duration}`,
+                localImage: bonusPowerImg,
+            };
+        }
+        case 'money': {
+            const amount = reward.amount / 1e6;
+            return {
+                text: `${amount} ${reward.currency}`,
+                subText: `${amount} ${reward.currency}`,
+            };
+        }
+        case 'season_pass_xp':
+            return {
+                text: `Event Pass ${reward.amount} XP`,
+                subText: `Event Pass ${reward.amount} XP`,
+                localImage: xpImg,
+            };
+        case 'battery':
+            return {
+                text: t('event.rewardTypes.battery'),
+                subText: `Battery x${reward.amount}`,
+                localImage: batteryImg,
+            };
+        case 'miner': {
+            const miner = reward.item as MinerItem | undefined;
+            if (miner) {
+                const bonusPct = (miner.bonus / 100);
+                return {
+                    text: miner.name.en,
+                    subText: `${formatPower(miner.power)} | ${bonusPct}%`,
+                    imageUrl: getMinerImageUrl(miner.filename),
+                };
+            }
+            return { text: t('event.rewardTypes.miner'), subText: '' };
+        }
+        case 'rack': {
+            const rack = reward.item as RackItem | undefined;
+            if (rack) {
+                return {
+                    text: rack.name.en,
+                    subText: `Rack Bonus:${rack.capacity * 5}%`,
+                };
+            }
+            return { text: t('event.rewardTypes.rack'), subText: '' };
+        }
+        case 'utility_item': {
+            const utility = reward.item as UtilityItem | undefined;
+            if (utility) {
+                return {
+                    text: `${utility.name.en} x${reward.amount}`,
+                    subText: utility.name.en,
+                    localImage: speedupImg,
+                };
+            }
+            return { text: t('event.rewardTypes.utilityItem'), subText: '' };
+        }
+        default:
+            return { text: reward.title.en, subText: '' };
+    }
+}
+
+export default function ProgressionEvent() {
+    const { t } = useTranslation();
+    const [eventData, setEventData] = useState<ParsedProgressionEvent | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<EventTab>('rewards');
+
+    // Multiplier settings
+    const [rltPrice, setRltPrice] = useState<number>(1.05);
+    const [boxPrice, setBoxPrice] = useState<number>(BOX_PRICE_OPTIONS[0]);
+    const [discount, setDiscount] = useState<number>(35);
+    const [filterMin, setFilterMin] = useState<number>(1);
+    const [filterMax, setFilterMax] = useState<number>(100);
+    const [showChart, setShowChart] = useState(false);
+
+    const MAX_MULTIPLIER = 100;
+
+    // Fetch event data
+    useEffect(() => {
+        const loadEvent = async () => {
+            // Check cache first
+            try {
+                const cachedData = localStorage.getItem(STORAGE_KEY);
+                const cachedTimestamp = localStorage.getItem(STORAGE_TIMESTAMP_KEY);
+                if (cachedData && cachedTimestamp) {
+                    const elapsed = Date.now() - parseInt(cachedTimestamp, 10);
+                    if (elapsed < CACHE_DURATION) {
+                        setEventData(JSON.parse(cachedData));
+                        setLoading(false);
+                        return;
+                    }
+                }
+            } catch {
+                // Ignore cache errors
+            }
+
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await fetchProgressionEvent();
+                setEventData(data);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                localStorage.setItem(STORAGE_TIMESTAMP_KEY, Date.now().toString());
+            } catch (err) {
+                console.error('Failed to fetch progression event:', err);
+                setError(err instanceof Error ? err.message : t('event.fetchError'));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadEvent();
+    }, [t]);
+
+    // Calculate total event rewards summary
+    const eventSummary = useMemo(() => {
+        if (!eventData) return null;
+
+        const rewards = eventData.data.rewards;
+        let totalMinerPower = 0;
+        let totalBonus = 0;
+        let tempPower = 0;
+        let seasonExp = 0;
+        let rstAmount = 0;
+
+        for (const reward of rewards) {
+            switch (reward.type) {
+                case 'miner': {
+                    const miner = reward.item as MinerItem | undefined;
+                    if (miner) {
+                        totalMinerPower += miner.power * reward.amount;
+                        totalBonus += miner.bonus * reward.amount;
+                    }
+                    break;
+                }
+                case 'power':
+                    tempPower += reward.amount;
+                    break;
+                case 'season_pass_xp':
+                    seasonExp += reward.amount;
+                    break;
+                case 'money':
+                    if (reward.currency === 'RST') {
+                        rstAmount += reward.amount / 1e6;
+                    }
+                    break;
+            }
+        }
+
+        return { totalMinerPower, totalBonus, tempPower, seasonExp, rstAmount };
+    }, [eventData]);
+
+    // Calculate multiplier table data
+    const multiplierData = useMemo(() => {
+        if (!eventData) return [];
+
+        const { max_xp } = eventData.data.event;
+        const rows = [];
+
+        for (let m = 1; m <= MAX_MULTIPLIER; m++) {
+            const rltToBuy = (m - 1) * 10;
+            const xpPerBox = boxPrice * EVENT_CONSTANTS.XP_PER_RLT * m;
+            const boxes = Math.ceil(max_xp / xpPerBox);
+            const totalRltCost = rltToBuy + boxes * boxPrice;
+            const marketTrade = Math.ceil(max_xp / (EVENT_CONSTANTS.MARKETPLACE_RATE * m));
+            const fee = Math.ceil(marketTrade * EVENT_CONSTANTS.FEE_RATE);
+            const discountPrice = rltToBuy * rltPrice * (1 - discount / 100);
+
+            rows.push({
+                multiplier: m,
+                rltToBuy,
+                boxes,
+                totalRltCost,
+                marketTrade,
+                fee,
+                discountPrice,
+            });
+        }
+
+        return rows;
+    }, [eventData, boxPrice, discount, rltPrice]);
+
+    // Filtered data for display
+    const filteredData = useMemo(() => {
+        return multiplierData.filter(r => r.multiplier >= filterMin && r.multiplier <= filterMax);
+    }, [multiplierData, filterMin, filterMax]);
+
+    // Chart max value for scaling
+    const chartMaxBoxes = useMemo(() => {
+        if (filteredData.length === 0) return 1;
+        return filteredData[0].boxes; // x1 always has the most boxes
+    }, [filteredData]);
+
+    // Countdown timer
+    const [timeLeft, setTimeLeft] = useState('');
+
+    useEffect(() => {
+        if (!eventData) return;
+
+        const updateCountdown = () => {
+            const end = new Date(eventData.endDate).getTime();
+            const now = Date.now();
+            const diff = end - now;
+
+            if (diff <= 0) {
+                setTimeLeft(t('event.ended'));
+                return;
+            }
+
+            const days = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+
+            if (days > 0) {
+                setTimeLeft(`${days}${t('event.daysShort')} : ${hours}${t('event.hoursShort')} : ${minutes}${t('event.minutesShort')}`);
+            } else {
+                setTimeLeft(`${hours}${t('event.hoursShort')} : ${minutes}${t('event.minutesShort')}`);
+            }
+        };
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 60000);
+        return () => clearInterval(interval);
+    }, [eventData, t]);
+
+    if (loading) {
+        return (
+            <div className="pe-container">
+                <div className="pe-loading">
+                    <span className="spinner" />
+                    <p>{t('event.loading')}</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="pe-container">
+                <div className="pe-error">
+                    <span className="pe-error-icon">⚠️</span>
+                    <p>{t('event.fetchError')}: {error}</p>
+                    <button
+                        className="btn-primary"
+                        onClick={() => window.location.reload()}
+                    >
+                        {t('event.retry')}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!eventData) return null;
+
+    const { event, rewards, levels_config } = eventData.data;
+
+    return (
+        <div className="pe-container">
+            {/* Event Header */}
+            <div className="pe-header">
+                <div className="pe-header-time">
+                    {t('event.leftTime')}: <strong>{timeLeft}</strong>
+                </div>
+                <h2 className="pe-title">{event.title.en}</h2>
+            </div>
+
+            <div className="pe-layout">
+                {/* Left Sidebar - Event Info */}
+                <aside className="pe-sidebar">
+                    {/* Event Difficulty */}
+                    <div className="pe-info-card">
+                        <h3 className="pe-info-title">{t('event.eventDifficulty')}</h3>
+                        <div className="pe-info-table">
+                            <div className="pe-info-row">
+                                <span>{t('event.multiplier')}</span>
+                                <span className="pe-info-value">{t('event.multiplierRate')}</span>
+                            </div>
+                            <div className="pe-info-row">
+                                <span>{t('event.multiplierDuration')}</span>
+                                <span className="pe-info-value">{EVENT_CONSTANTS.MULTIPLIER_DURATION_HOURS} {t('event.hourUnit')}</span>
+                            </div>
+                            <div className="pe-info-row">
+                                <span>{t('event.gameDifficulty')}</span>
+                                <span className="pe-info-value">{EVENT_CONSTANTS.GAME_DIFFICULTY}</span>
+                            </div>
+                            <div className="pe-info-row">
+                                <span>{t('event.spend1Rlt')}</span>
+                                <span className="pe-info-value">{EVENT_CONSTANTS.XP_PER_RLT}</span>
+                            </div>
+                            <div className="pe-info-row">
+                                <span>{t('event.marketplace')}</span>
+                                <span className="pe-info-value">{EVENT_CONSTANTS.MARKETPLACE_RATE}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Total Event Rewards */}
+                    {eventSummary && (
+                        <div className="pe-info-card">
+                            <h3 className="pe-info-title">{t('event.totalRewards')}</h3>
+                            <div className="pe-info-table">
+                                <div className="pe-info-row">
+                                    <span>{t('event.minersPower')}</span>
+                                    <span className="pe-info-value pe-highlight">{formatPower(eventSummary.totalMinerPower)}</span>
+                                </div>
+                                <div className="pe-info-row">
+                                    <span>{t('event.minersBonus')}</span>
+                                    <span className="pe-info-value pe-highlight">{(eventSummary.totalBonus / 100).toFixed(2)}%</span>
+                                </div>
+                                <div className="pe-info-row">
+                                    <span>{t('event.tempPower')}</span>
+                                    <span className="pe-info-value pe-highlight">{formatPower(eventSummary.tempPower)}</span>
+                                </div>
+                                <div className="pe-info-row">
+                                    <span>{t('event.seasonExp')}</span>
+                                    <span className="pe-info-value pe-highlight">{eventSummary.seasonExp} EXP</span>
+                                </div>
+                                <div className="pe-info-row">
+                                    <span>RST</span>
+                                    <span className="pe-info-value pe-highlight">{eventSummary.rstAmount} RST</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </aside>
+
+                {/* Main Content */}
+                <div className="pe-main">
+                    {/* Sub-tabs */}
+                    <div className="pe-tabs">
+                        <button
+                            className={`pe-tab ${activeTab === 'rewards' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('rewards')}
+                        >
+                            {t('event.rewardsTab')}
+                        </button>
+                        <button
+                            className={`pe-tab ${activeTab === 'multiplier' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('multiplier')}
+                        >
+                            {t('event.multiplierTab')}
+                        </button>
+                    </div>
+
+                    {/* Rewards Table */}
+                    {activeTab === 'rewards' && (
+                        <div className="pe-table-container">
+                            <table className="pe-table">
+                                <thead>
+                                    <tr>
+                                        <th>{t('event.headers.lvl')}</th>
+                                        <th>{t('event.headers.total')}</th>
+                                        <th className="pe-rewards-col">{t('event.headers.rewards')}</th>
+                                        <th>{t('event.headers.points')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {levels_config.map((level: LevelConfig) => {
+                                        const reward = rewards.find(
+                                            (r: ProgressionReward) => r.required_level === level.level
+                                        );
+                                        const display = reward ? getRewardDisplay(reward, t) : null;
+                                        const typeImage = reward ? getRewardTypeImage(reward.type) : null;
+
+                                        return (
+                                            <tr key={level.level} className="pe-multiplier-row">
+                                                <td className="pe-number-cell pe-multiplier-cell">
+                                                    <span className="pe-multiplier-badge">{level.level}</span>
+                                                </td>
+                                                <td className="pe-number-cell pe-total-cell">
+                                                    {formatNumber(level.required_xp)}
+                                                </td>
+                                                <td className="pe-rewards-col">
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', width: 'fit-content', margin: '0 auto', textAlign: 'left' }}>
+                                                        <div style={{ width: '96px', display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+                                                            {display?.imageUrl ? (
+                                                                <img src={display.imageUrl} alt={display.text} style={{ maxWidth: '96px', maxHeight: '64px', objectFit: 'contain' }} loading="lazy" />
+                                                            ) : display?.localImage ? (
+                                                                <img src={display.localImage} alt={display.text} style={{ width: '48px', height: '48px', objectFit: 'contain' }} loading="lazy" />
+                                                            ) : typeImage ? (
+                                                                <img src={typeImage} alt={reward?.type || ''} style={{ width: '48px', height: '48px', objectFit: 'contain' }} loading="lazy" />
+                                                            ) : (
+                                                                <span style={{ fontSize: '32px' }}>🎁</span>
+                                                            )}
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                            <span style={{ fontWeight: 500, fontSize: '14px', color: 'var(--text-secondary)' }}>{display?.text ?? '-'}</span>
+                                                            <span style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)' }}>{display?.subText ?? ''}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="pe-number-cell pe-boxes-cell" style={{ color: 'var(--accent-primary)' }}>
+                                                    {formatNumber(level.level_xp)} {t('event.pointsUnit')}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {/* Multiplier Section */}
+                    {activeTab === 'multiplier' && (
+                        <>
+                            {/* Controls Bar */}
+                            <div className="pe-controls-bar">
+                                <div className="pe-control-group pe-filter-group">
+                                    <label className="pe-control-label">{t('event.filter')}</label>
+                                    <div className="pe-filter-inputs">
+                                        <input
+                                            type="number"
+                                            className="pe-filter-input"
+                                            value={filterMin}
+                                            onChange={(e) => {
+                                                const v = parseInt(e.target.value);
+                                                if (!isNaN(v) && v >= 1 && v <= filterMax) setFilterMin(v);
+                                            }}
+                                            min={1}
+                                            max={filterMax}
+                                        />
+                                        <span className="pe-filter-sep">—</span>
+                                        <input
+                                            type="number"
+                                            className="pe-filter-input"
+                                            value={filterMax}
+                                            onChange={(e) => {
+                                                const v = parseInt(e.target.value);
+                                                if (!isNaN(v) && v >= filterMin && v <= MAX_MULTIPLIER) setFilterMax(v);
+                                            }}
+                                            min={filterMin}
+                                            max={MAX_MULTIPLIER}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="pe-control-group">
+                                    <label className="pe-control-label">{t('event.chart')}</label>
+                                    <button
+                                        className={`pe-chart-toggle ${showChart ? 'active' : ''}`}
+                                        onClick={() => setShowChart(!showChart)}
+                                    >
+                                        📊
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Chart */}
+                            {showChart && (
+                                <div className="pe-chart-container">
+                                    <h4 className="pe-chart-title">{t('event.chartTitle')}</h4>
+                                    <div className="pe-chart">
+                                        {filteredData.map((row) => {
+                                            const barWidth = (row.boxes / chartMaxBoxes) * 100;
+                                            return (
+                                                <div key={row.multiplier} className="pe-chart-row">
+                                                    <span className="pe-chart-label">x{row.multiplier}</span>
+                                                    <div className="pe-chart-bar-bg">
+                                                        <div
+                                                            className="pe-chart-bar"
+                                                            style={{ width: `${barWidth}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="pe-chart-value">{formatNumber(row.boxes)}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Table */}
+                            <div className="pe-table-container">
+                                <table className="pe-table pe-multiplier-table">
+                                    <thead>
+                                        <tr>
+                                            <th>{t('event.headers.multiplier')}</th>
+                                            <th>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                                    {t('event.headers.rltToBuy')}
+                                                    <input
+                                                        type="number"
+                                                        className="pe-filter-input"
+                                                        value={rltPrice}
+                                                        onChange={(e) => setRltPrice(Number(e.target.value))}
+                                                        step="0.01"
+                                                        min="0"
+                                                        style={{ width: '68px', padding: '4px 6px', fontSize: '13px', lineHeight: '1' }}
+                                                    />
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                                    {t('event.headers.discount')}
+                                                    <select
+                                                        className="pe-select"
+                                                        value={discount}
+                                                        onChange={(e) => setDiscount(Number(e.target.value))}
+                                                        style={{ padding: '4px 24px 4px 10px', fontSize: '13px', height: 'auto', lineHeight: '1' }}
+                                                    >
+                                                        {DISCOUNT_OPTIONS.map((d) => (
+                                                            <option key={d} value={d}>{d}%</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                                    {t('event.headers.boxesOf')}
+                                                    <select
+                                                        className="pe-select"
+                                                        value={boxPrice}
+                                                        onChange={(e) => setBoxPrice(Number(e.target.value))}
+                                                        style={{ padding: '4px 24px 4px 10px', fontSize: '13px', height: 'auto', lineHeight: '1' }}
+                                                    >
+                                                        {BOX_PRICE_OPTIONS.map((p) => (
+                                                            <option key={p} value={p}>{p} RLT</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </th>
+                                            <th>{t('event.headers.totalCost')}</th>
+                                            <th>{t('event.headers.marketTrade')}</th>
+                                            <th>{t('event.headers.fee')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredData.map((row) => (
+                                            <tr key={row.multiplier} className="pe-multiplier-row">
+                                                <td className="pe-multiplier-cell">
+                                                    <span className="pe-multiplier-badge">x{row.multiplier}</span>
+                                                </td>
+                                                <td className="pe-number-cell">{row.rltToBuy}</td>
+                                                <td className="pe-number-cell pe-discount-cell">
+                                                    $ {row.discountPrice.toFixed(2)}
+                                                </td>
+                                                <td className="pe-number-cell pe-boxes-cell">
+                                                    {formatNumber(row.boxes)}
+                                                </td>
+                                                <td className="pe-number-cell pe-total-cell">
+                                                    {formatNumber(row.totalRltCost)}
+                                                </td>
+                                                <td className="pe-number-cell">
+                                                    {formatNumber(row.marketTrade)}
+                                                </td>
+                                                <td className="pe-number-cell pe-fee-cell">
+                                                    {formatNumber(row.fee)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}

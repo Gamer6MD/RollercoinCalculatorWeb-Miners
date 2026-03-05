@@ -25,6 +25,7 @@ import { Helmet } from 'react-helmet-async';
 const WithdrawTimer = React.lazy(() => import('./components/WithdrawTimer'));
 const PowerSimulator = React.lazy(() => import('./components/PowerSimulator'));
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
+const ProgressionEvent = React.lazy(() => import('./components/ProgressionEvent'));
 
 import './index.css';
 
@@ -108,6 +109,15 @@ function App() {
 
   // Notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  // Hash-based routing for event page
+  const [showEventPage, setShowEventPage] = useState(() => window.location.hash === '#currentpe');
+
+  useEffect(() => {
+    const onHashChange = () => setShowEventPage(window.location.hash === '#currentpe');
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotification({ message, type });
@@ -294,7 +304,7 @@ function App() {
       const savedFetchedUser = localStorage.getItem('rollercoin_web_fetched_user');
       if (savedFetchedUser) setFetchedUser(JSON.parse(savedFetchedUser));
       if (savedBalances) setBalances(JSON.parse(savedBalances));
-      if (savedTab === 'calculator' || savedTab === 'withdraw') setActiveTab(savedTab);
+      if (savedTab === 'calculator' || savedTab === 'withdraw' || savedTab === 'simulator') setActiveTab(savedTab);
       if (savedApiLeagues) setApiLeagues(JSON.parse(savedApiLeagues));
       const savedRawApiData = localStorage.getItem('rollercoin_web_raw_api_data');
       if (savedRawApiData) setRawApiData(JSON.parse(savedRawApiData));
@@ -653,102 +663,124 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="main-content">
-        {/* Data Input Form */}
-        <DataInputForm
-          onDataParsed={handleDataParsed}
-          currentCoins={coins}
-          currentUserPower={userPower}
-          displayPower={displayPower}
-          currentLeague={league}
-          isAutoLeague={isAutoLeague}
-          onLeagueChange={handleLeagueChange}
-          onToggleAutoLeague={toggleAutoLeague}
-          onShowNotification={showNotification}
-          onApiLeaguesLoaded={handleApiLeaguesLoaded}
-          apiLeagues={apiLeagues}
-          onFetchUser={handleFetchUser}
-          isFetchingUser={isFetchingUser}
-          globalUserName={globalUserName}
-          setGlobalUserName={setGlobalUserName}
-          onForceFetchPrices={handleForceFetchPrices}
-          fetchMode={fetchMode}
-          setFetchMode={setFetchMode}
-        />
-
-        {/* Tabs */}
-        {earnings.length > 0 && (
-          <div className="main-tabs">
-            <div
-              className="main-tabs-bg"
-              style={{ transform: `translateX(calc(${TAB_ORDER[activeTab] * 100}% + calc(${TAB_ORDER[activeTab]} * var(--tab-gap))))` }}
-            />
-            <button
-              className={`main-tab ${activeTab === 'calculator' ? 'active' : ''}`}
-              onClick={() => handleTabChange('calculator')}
-            >
-              <span className="tab-icon">📊</span>
-              {t('tabs.earnings')}
-            </button>
-            <button
-              className={`main-tab ${activeTab === 'simulator' ? 'active' : ''}`}
-              onClick={() => handleTabChange('simulator')}
-            >
-              <span className="tab-icon">⚡</span>
-              {t('tabs.simulator')}
-            </button>
-            <button
-              className={`main-tab ${activeTab === 'withdraw' ? 'active' : ''}`}
-              onClick={() => handleTabChange('withdraw')}
-            >
-              <span className="tab-icon">⏱️</span>
-              {t('tabs.withdraw')}
-            </button>
+      {showEventPage ? (
+        <main className="main-content">
+          <a href="#" className="pe-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }}>
+            {t('event.backToCalc')}
+          </a>
+          <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
+            <ProgressionEvent />
+          </React.Suspense>
+        </main>
+      ) : (
+        <main className="main-content">
+          {/* Event Page Link (Top) */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            <a href="#currentpe" className="pe-event-link" style={{ margin: 0 }}>
+              <span className="tab-icon">🎉</span>
+              {t('tabs.event')}
+            </a>
           </div>
-        )}
 
-        {/* Content based on Tab - Slider */}
-        {earnings.length > 0 && (
+          {/* Data Input Form */}
+          <DataInputForm
+            onDataParsed={handleDataParsed}
+            currentCoins={coins}
+            currentUserPower={userPower}
+            displayPower={displayPower}
+            currentLeague={league}
+            isAutoLeague={isAutoLeague}
+            onLeagueChange={handleLeagueChange}
+            onToggleAutoLeague={toggleAutoLeague}
+            onShowNotification={showNotification}
+            onApiLeaguesLoaded={handleApiLeaguesLoaded}
+            apiLeagues={apiLeagues}
+            onFetchUser={handleFetchUser}
+            isFetchingUser={isFetchingUser}
+            globalUserName={globalUserName}
+            setGlobalUserName={setGlobalUserName}
+            onForceFetchPrices={handleForceFetchPrices}
+            fetchMode={fetchMode}
+            setFetchMode={setFetchMode}
+          />
+
+          {/* Tabs */}
+          {earnings.length > 0 && (
+            <div className="main-tabs">
+              <div
+                className="main-tabs-bg"
+                style={{ transform: `translateX(calc(${TAB_ORDER[activeTab] * 100}% + calc(${TAB_ORDER[activeTab]} * var(--tab-gap))))` }}
+              />
+              <button
+                className={`main-tab ${activeTab === 'calculator' ? 'active' : ''}`}
+                onClick={() => handleTabChange('calculator')}
+              >
+                <span className="tab-icon">📊</span>
+                {t('tabs.earnings')}
+              </button>
+              <button
+                className={`main-tab ${activeTab === 'simulator' ? 'active' : ''}`}
+                onClick={() => handleTabChange('simulator')}
+              >
+                <span className="tab-icon">⚡</span>
+                {t('tabs.simulator')}
+              </button>
+              <button
+                className={`main-tab ${activeTab === 'withdraw' ? 'active' : ''}`}
+                onClick={() => handleTabChange('withdraw')}
+              >
+                <span className="tab-icon">⏱️</span>
+                {t('tabs.withdraw')}
+              </button>
+            </div>
+          )}
+
+
+          {/* Content based on Tab - Slider */}
           <div className="tab-slider-viewport">
             <div
               className="tab-slider-track"
               style={{ transform: `translateX(-${TAB_ORDER[activeTab] * 100}%)` }}
             >
-              <div className="tab-panel">
-                <EarningsTable
-                  earnings={earnings}
-                  prices={prices}
-                  onOpenSettings={() => setIsSettingsOpen(true)}
-                  onShowNotification={showNotification}
-                />
-              </div>
-              <div className="tab-panel">
-                <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
-                  <PowerSimulator
-                    currentLeague={league}
-                    apiLeagues={apiLeagues || null}
-                    fetchedUser={fetchedUser}
-                    onFetchUser={handleFetchUser}
-                    isFetchingUser={isFetchingUser}
-                    globalUserName={globalUserName}
-                    setGlobalUserName={setGlobalUserName}
-                  />
-                </React.Suspense>
-              </div>
-              <div className="tab-panel">
-                <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
-                  <WithdrawTimer
-                    earnings={earnings}
-                    balances={balances}
-                    onBalanceChange={handleBalanceChange}
-                    prices={prices}
-                  />
-                </React.Suspense>
-              </div>
+              {earnings.length > 0 && (
+                <>
+                  <div className="tab-panel">
+                    <EarningsTable
+                      earnings={earnings}
+                      prices={prices}
+                      onOpenSettings={() => setIsSettingsOpen(true)}
+                      onShowNotification={showNotification}
+                    />
+                  </div>
+                  <div className="tab-panel">
+                    <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
+                      <PowerSimulator
+                        currentLeague={league}
+                        apiLeagues={apiLeagues || null}
+                        fetchedUser={fetchedUser}
+                        onFetchUser={handleFetchUser}
+                        isFetchingUser={isFetchingUser}
+                        globalUserName={globalUserName}
+                        setGlobalUserName={setGlobalUserName}
+                      />
+                    </React.Suspense>
+                  </div>
+                  <div className="tab-panel">
+                    <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
+                      <WithdrawTimer
+                        earnings={earnings}
+                        balances={balances}
+                        onBalanceChange={handleBalanceChange}
+                        prices={prices}
+                      />
+                    </React.Suspense>
+                  </div>
+                </>
+              )}
             </div>
           </div>
-        )}
-      </main>
+        </main>
+      )}
 
       {/* Footer */}
       <footer className="footer">

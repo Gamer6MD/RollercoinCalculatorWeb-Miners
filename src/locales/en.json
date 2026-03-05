@@ -13,7 +13,8 @@
     "tabs": {
         "earnings": "Earnings Calculator",
         "withdraw": "Withdrawal Timer",
-        "simulator": "Power Simulator"
+        "simulator": "Power Simulator",
+        "event": "Event"
     },
     "input": {
         "title": "Data Input & Settings",
@@ -126,5 +127,58 @@
         "blockDurationDesc": "Customize block durations (seconds). Default ~600s (10 min).",
         "save": "Save",
         "cancel": "Cancel"
+    },
+    "event": {
+        "loading": "Loading event data...",
+        "fetchError": "Failed to load event data",
+        "retry": "Retry",
+        "ended": "Event ended",
+        "days": "days",
+        "daysShort": "d",
+        "hoursShort": "h",
+        "minutesShort": "m",
+        "hourUnit": "hour(s)",
+        "pointsUnit": "pts",
+        "eventDifficulty": "Event Difficulty",
+        "multiplier": "Multiplier",
+        "multiplierRate": "1x per 10 RLT",
+        "multiplierDuration": "Multiplier Duration",
+        "gameDifficulty": "Game Difficulty",
+        "spend1Rlt": "Spend 1 RLT",
+        "marketplace": "Marketplace",
+        "totalRewards": "Total Event Rewards",
+        "minersPower": "Miners Power",
+        "minersBonus": "Miners Bonus",
+        "tempPower": "Temp Power",
+        "seasonExp": "Season Exp",
+        "rewardsTab": "Rewards",
+        "multiplierTab": "Multiplier",
+        "leftTime": "Left time",
+        "filter": "Filter",
+        "chart": "Chart",
+        "chartTitle": "Multiplier vs Boxes Chart",
+        "rltPriceLabel": "RLT PRICE (USD)",
+        "backToCalc": "← Back to Calculator",
+        "headers": {
+            "lvl": "LVL",
+            "total": "Total",
+            "points": "Points",
+            "rewards": "Rewards",
+            "multiplier": "Multiplier",
+            "rltToBuy": "RLT to buy",
+            "discount": "Discount",
+            "boxesOf": "Boxes of",
+            "totalCost": "Total RLT",
+            "marketTrade": "Market trade",
+            "fee": "Fee"
+        },
+        "rewardTypes": {
+            "power": "Bonus Power",
+            "seasonXp": "Season Pass XP",
+            "battery": "Battery",
+            "miner": "Miner",
+            "rack": "Rack",
+            "utilityItem": "Utility Item"
+        }
     }
 }

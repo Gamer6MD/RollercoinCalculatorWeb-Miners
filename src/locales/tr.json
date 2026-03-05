@@ -13,7 +13,8 @@
     "tabs": {
         "earnings": "Kazanç Hesaplayıcı",
         "withdraw": "Çekim Sayacı",
-        "simulator": "Güç Simülatörü"
+        "simulator": "Güç Simülatörü",
+        "event": "Etkinlik"
     },
     "input": {
         "title": "Veri Girişi & Ayarlar",
@@ -126,5 +127,58 @@
         "blockDurationDesc": "Blok sürelerini (saniye) özelleştirin. Varsayılan ~600 saniye (10 dk).",
         "save": "Kaydet",
         "cancel": "İptal"
+    },
+    "event": {
+        "loading": "Etkinlik verileri yükleniyor...",
+        "fetchError": "Etkinlik verileri yüklenemedi",
+        "retry": "Tekrar Dene",
+        "ended": "Etkinlik sona erdi",
+        "days": "gün",
+        "daysShort": "g",
+        "hoursShort": "s",
+        "minutesShort": "dk",
+        "hourUnit": "saat",
+        "pointsUnit": "puan",
+        "eventDifficulty": "Etkinlik Zorluğu",
+        "multiplier": "Çarpan",
+        "multiplierRate": "10 RLT başına 1x",
+        "multiplierDuration": "Çarpan Süresi",
+        "gameDifficulty": "Oyun Zorluğu",
+        "spend1Rlt": "1 RLT Harcama",
+        "marketplace": "Market",
+        "totalRewards": "Toplam Etkinlik Ödülleri",
+        "minersPower": "Madenci Gücü",
+        "minersBonus": "Madenci Bonusu",
+        "tempPower": "Geçici Güç",
+        "seasonExp": "Sezon EXP",
+        "rewardsTab": "Ödüller",
+        "multiplierTab": "Çarpan",
+        "leftTime": "Kalan Süre",
+        "filter": "Filtre",
+        "chart": "Grafik",
+        "chartTitle": "Çarpan - Kutu Sayısı Grafiği",
+        "rltPriceLabel": "RLT FİYATI (USD)",
+        "backToCalc": "← Hesaplayıcıya Dön",
+        "headers": {
+            "lvl": "SEVİYE",
+            "total": "Toplam",
+            "points": "Puan",
+            "rewards": "Ödüller",
+            "multiplier": "Çarpan",
+            "rltToBuy": "Alınacak RLT",
+            "discount": "İndirim",
+            "boxesOf": "Kutu Sayısı",
+            "totalCost": "Toplam RLT",
+            "marketTrade": "Market İşlem",
+            "fee": "Ücret"
+        },
+        "rewardTypes": {
+            "power": "Bonus Güç",
+            "seasonXp": "Sezon XP",
+            "battery": "Pil",
+            "miner": "Madenci",
+            "rack": "Raf",
+            "utilityItem": "Yardımcı Eşya"
+        }
     }
 }
