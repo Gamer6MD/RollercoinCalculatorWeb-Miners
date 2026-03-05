@@ -460,7 +460,7 @@ export default function ProgressionEvent() {
                                                                         <img
                                                                             src={`https://rollercoin.com/static/img/storage/rarity_icons/level_${display.level}.png?v=1.0.0`}
                                                                             alt={`Level ${display.level}`}
-                                                                            style={{ position: 'absolute', top: '0px', left: '0px', width: '22px', height: '14px', objectFit: 'contain', zIndex: 2 }}
+                                                                            style={{ position: 'absolute', top: '0px', left: '-5px', width: '22px', height: '14px', objectFit: 'contain', zIndex: 2 }}
                                                                         />
                                                                     )}
                                                                     <img src={display.imageUrl} alt={display.text} style={{ maxWidth: '96px', maxHeight: '64px', objectFit: 'contain' }} loading="lazy" />
