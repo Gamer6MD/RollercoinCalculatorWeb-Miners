@@ -761,7 +761,7 @@ function App() {
               >
                 {earnings.length > 0 && (
                   <>
-                    <div className="tab-panel">
+                    <div className={`tab-panel ${activeTab === 'calculator' ? 'active' : ''}`}>
                       <EarningsTable
                         earnings={earnings}
                         prices={prices}
@@ -769,7 +769,7 @@ function App() {
                         onShowNotification={showNotification}
                       />
                     </div>
-                    <div className="tab-panel">
+                    <div className={`tab-panel ${activeTab === 'simulator' ? 'active' : ''}`}>
                       <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
                         <PowerSimulator
                           currentLeague={league}
@@ -782,7 +782,7 @@ function App() {
                         />
                       </React.Suspense>
                     </div>
-                    <div className="tab-panel">
+                    <div className={`tab-panel ${activeTab === 'withdraw' ? 'active' : ''}`}>
                       <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
                         <WithdrawTimer
                           earnings={earnings}
