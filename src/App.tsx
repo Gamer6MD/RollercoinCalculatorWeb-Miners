@@ -588,210 +588,237 @@ function App() {
   }, [fetchMode, fetchedUser, userPower]);
 
   return (
-    <div className="app">
-      <React.Suspense fallback={null}>
-        <SettingsModal
-          isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-          blockDurations={blockDurations}
-          onSave={handleSaveDurations}
-          coins={coins.length > 0 ? coins.map(c => c.displayName) : ['BTC', 'ETH', 'DOGE', 'BNB', 'MATIC', 'SOL', 'TRX', 'LTC', 'RST']}
-        />
-      </React.Suspense>
-      {/* Notification */}
-      {notification && (
-        <div className="notification-container">
-          <Notification
-            message={notification.message}
-            type={notification.type}
-            onClose={() => setNotification(null)}
-          />
+    <div className="app-layout">
+      {/* Left Side Ad - Desktop Only */}
+      <div className="side-ad side-ad-left">
+        <div className="side-ad-inner">
+          <iframe data-aa="2429577" src="//ad.a-ads.com/2429577/?size=160x600&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: '0 auto' }}
+            title="Ad Left" />
         </div>
-      )}
+      </div>
 
-      {/* SEO Tags */}
-      <Helmet>
-        <title>{t('seo.title')}</title>
-        <meta name="description" content={t('seo.description')} />
-        <link rel="canonical" href={currentUrl} />
-        <meta property="og:title" content={t('seo.title')} />
-        <meta property="og:description" content={t('seo.description')} />
-        <meta property="og:url" content={currentUrl} />
-        <meta name="twitter:title" content={t('seo.title')} />
-        <meta name="twitter:description" content={t('seo.description')} />
-      </Helmet>
+      <div className="app">
+        <React.Suspense fallback={null}>
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            blockDurations={blockDurations}
+            onSave={handleSaveDurations}
+            coins={coins.length > 0 ? coins.map(c => c.displayName) : ['BTC', 'ETH', 'DOGE', 'BNB', 'MATIC', 'SOL', 'TRX', 'LTC', 'RST']}
+          />
+        </React.Suspense>
+        {/* Notification */}
+        {notification && (
+          <div className="notification-container">
+            <Notification
+              message={notification.message}
+              type={notification.type}
+              onClose={() => setNotification(null)}
+            />
+          </div>
+        )}
 
-      {/* Header */}
-      <header className="header">
-        <div className="header-content">
-          <div className="header-logo">
-            <img src={appLogo} alt="Logo" width="80" height="80" className="app-main-logo" />
-          </div>
-          <div className="header-title">
-            <h1>{t('app.title')}</h1>
-          </div>
-          <div className="header-right-group">
-            <div className="lang-switcher">
-              <button
-                onClick={() => changeLanguage('tr')}
-                className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
-              >
-                <img src={trFlag} alt="TR" className="flag-icon" />
-                <span className="lang-text">Türkçe</span>
-              </button>
-              <button
-                onClick={() => changeLanguage('en')}
-                className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
-              >
-                <img src={gbFlag} alt="GB" className="flag-icon" />
-                <span className="lang-text">English</span>
-              </button>
+        {/* SEO Tags */}
+        <Helmet>
+          <title>{t('seo.title')}</title>
+          <meta name="description" content={t('seo.description')} />
+          <link rel="canonical" href={currentUrl} />
+          <meta property="og:title" content={t('seo.title')} />
+          <meta property="og:description" content={t('seo.description')} />
+          <meta property="og:url" content={currentUrl} />
+          <meta name="twitter:title" content={t('seo.title')} />
+          <meta name="twitter:description" content={t('seo.description')} />
+        </Helmet>
+
+        {/* Header */}
+        <header className="header">
+          <div className="header-content">
+            <div className="header-logo">
+              <img src={appLogo} alt="Logo" width="80" height="80" className="app-main-logo" />
             </div>
-            <a
-              href="https://github.com/BurakTemelkaya/RollercoinCalculatorWeb"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="github-link"
-              title="GitHub"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-            </a>
+            <div className="header-title">
+              <h1>{t('app.title')}</h1>
+            </div>
+            <div className="header-right-group">
+              <div className="lang-switcher">
+                <button
+                  onClick={() => changeLanguage('tr')}
+                  className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
+                >
+                  <img src={trFlag} alt="TR" className="flag-icon" />
+                  <span className="lang-text">Türkçe</span>
+                </button>
+                <button
+                  onClick={() => changeLanguage('en')}
+                  className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
+                >
+                  <img src={gbFlag} alt="GB" className="flag-icon" />
+                  <span className="lang-text">English</span>
+                </button>
+              </div>
+              <a
+                href="https://github.com/BurakTemelkaya/RollercoinCalculatorWeb"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="github-link"
+                title="GitHub"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </a>
+            </div>
           </div>
+        </header>
+
+        {/* Mobile Ad Banner - Hidden on desktop where side ads show */}
+        <div className="mobile-ad">
+          <iframe data-aa="2429578" src="//acceptable.a-ads.com/2429578/?size=Adaptive&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: '0 auto' }}
+            title="Ad Mobile" />
         </div>
-      </header>
 
-      {/* Main Content */}
-      {showEventPage ? (
-        <main className="main-content">
-          <a href="#" className="pe-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }}>
-            {t('event.backToCalc')}
-          </a>
-          <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
-            <ProgressionEvent />
-          </React.Suspense>
-        </main>
-      ) : (
-        <main className="main-content">
-          {/* Event Page Link (Top) */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <a href="#currentpe" className="pe-event-link" style={{ margin: 0 }}>
-              <span className="tab-icon">🎉</span>
-              {t('tabs.event')}
+        {/* Main Content */}
+        {showEventPage ? (
+          <main className="main-content">
+            <a href="#" className="pe-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }}>
+              {t('event.backToCalc')}
             </a>
-          </div>
+            <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
+              <ProgressionEvent />
+            </React.Suspense>
+          </main>
+        ) : (
+          <main className="main-content">
+            {/* Event Page Link (Top) */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+              <a href="#currentpe" className="pe-event-link" style={{ margin: 0 }}>
+                <span className="tab-icon">🎉</span>
+                {t('tabs.event')}
+              </a>
+            </div>
 
-          {/* Data Input Form */}
-          <DataInputForm
-            onDataParsed={handleDataParsed}
-            currentCoins={coins}
-            currentUserPower={userPower}
-            displayPower={displayPower}
-            currentLeague={league}
-            isAutoLeague={isAutoLeague}
-            onLeagueChange={handleLeagueChange}
-            onToggleAutoLeague={toggleAutoLeague}
-            onShowNotification={showNotification}
-            onApiLeaguesLoaded={handleApiLeaguesLoaded}
-            apiLeagues={apiLeagues}
-            onFetchUser={handleFetchUser}
-            isFetchingUser={isFetchingUser}
-            globalUserName={globalUserName}
-            setGlobalUserName={setGlobalUserName}
-            onForceFetchPrices={handleForceFetchPrices}
-            fetchMode={fetchMode}
-            setFetchMode={setFetchMode}
-          />
+            {/* Data Input Form */}
+            <DataInputForm
+              onDataParsed={handleDataParsed}
+              currentCoins={coins}
+              currentUserPower={userPower}
+              displayPower={displayPower}
+              currentLeague={league}
+              isAutoLeague={isAutoLeague}
+              onLeagueChange={handleLeagueChange}
+              onToggleAutoLeague={toggleAutoLeague}
+              onShowNotification={showNotification}
+              onApiLeaguesLoaded={handleApiLeaguesLoaded}
+              apiLeagues={apiLeagues}
+              onFetchUser={handleFetchUser}
+              isFetchingUser={isFetchingUser}
+              globalUserName={globalUserName}
+              setGlobalUserName={setGlobalUserName}
+              onForceFetchPrices={handleForceFetchPrices}
+              fetchMode={fetchMode}
+              setFetchMode={setFetchMode}
+            />
 
-          {/* Tabs */}
-          {earnings.length > 0 && (
-            <div className="main-tabs">
+            {/* Tabs */}
+            {earnings.length > 0 && (
+              <div className="main-tabs">
+                <div
+                  className="main-tabs-bg"
+                  style={{ transform: `translateX(calc(${TAB_ORDER[activeTab] * 100}% + calc(${TAB_ORDER[activeTab]} * var(--tab-gap))))` }}
+                />
+                <button
+                  className={`main-tab ${activeTab === 'calculator' ? 'active' : ''}`}
+                  onClick={() => handleTabChange('calculator')}
+                >
+                  <span className="tab-icon">📊</span>
+                  {t('tabs.earnings')}
+                </button>
+                <button
+                  className={`main-tab ${activeTab === 'simulator' ? 'active' : ''}`}
+                  onClick={() => handleTabChange('simulator')}
+                >
+                  <span className="tab-icon">⚡</span>
+                  {t('tabs.simulator')}
+                </button>
+                <button
+                  className={`main-tab ${activeTab === 'withdraw' ? 'active' : ''}`}
+                  onClick={() => handleTabChange('withdraw')}
+                >
+                  <span className="tab-icon">⏱️</span>
+                  {t('tabs.withdraw')}
+                </button>
+              </div>
+            )}
+
+
+            {/* Content based on Tab - Slider */}
+            <div className="tab-slider-viewport">
               <div
-                className="main-tabs-bg"
-                style={{ transform: `translateX(calc(${TAB_ORDER[activeTab] * 100}% + calc(${TAB_ORDER[activeTab]} * var(--tab-gap))))` }}
-              />
-              <button
-                className={`main-tab ${activeTab === 'calculator' ? 'active' : ''}`}
-                onClick={() => handleTabChange('calculator')}
+                className="tab-slider-track"
+                style={{ transform: `translateX(-${TAB_ORDER[activeTab] * 100}%)` }}
               >
-                <span className="tab-icon">📊</span>
-                {t('tabs.earnings')}
-              </button>
-              <button
-                className={`main-tab ${activeTab === 'simulator' ? 'active' : ''}`}
-                onClick={() => handleTabChange('simulator')}
-              >
-                <span className="tab-icon">⚡</span>
-                {t('tabs.simulator')}
-              </button>
-              <button
-                className={`main-tab ${activeTab === 'withdraw' ? 'active' : ''}`}
-                onClick={() => handleTabChange('withdraw')}
-              >
-                <span className="tab-icon">⏱️</span>
-                {t('tabs.withdraw')}
-              </button>
-            </div>
-          )}
-
-
-          {/* Content based on Tab - Slider */}
-          <div className="tab-slider-viewport">
-            <div
-              className="tab-slider-track"
-              style={{ transform: `translateX(-${TAB_ORDER[activeTab] * 100}%)` }}
-            >
-              {earnings.length > 0 && (
-                <>
-                  <div className="tab-panel">
-                    <EarningsTable
-                      earnings={earnings}
-                      prices={prices}
-                      onOpenSettings={() => setIsSettingsOpen(true)}
-                      onShowNotification={showNotification}
-                    />
-                  </div>
-                  <div className="tab-panel">
-                    <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
-                      <PowerSimulator
-                        currentLeague={league}
-                        apiLeagues={apiLeagues || null}
-                        fetchedUser={fetchedUser}
-                        onFetchUser={handleFetchUser}
-                        isFetchingUser={isFetchingUser}
-                        globalUserName={globalUserName}
-                        setGlobalUserName={setGlobalUserName}
-                      />
-                    </React.Suspense>
-                  </div>
-                  <div className="tab-panel">
-                    <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
-                      <WithdrawTimer
+                {earnings.length > 0 && (
+                  <>
+                    <div className="tab-panel">
+                      <EarningsTable
                         earnings={earnings}
-                        balances={balances}
-                        onBalanceChange={handleBalanceChange}
                         prices={prices}
+                        onOpenSettings={() => setIsSettingsOpen(true)}
+                        onShowNotification={showNotification}
                       />
-                    </React.Suspense>
-                  </div>
-                </>
-              )}
+                    </div>
+                    <div className="tab-panel">
+                      <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
+                        <PowerSimulator
+                          currentLeague={league}
+                          apiLeagues={apiLeagues || null}
+                          fetchedUser={fetchedUser}
+                          onFetchUser={handleFetchUser}
+                          isFetchingUser={isFetchingUser}
+                          globalUserName={globalUserName}
+                          setGlobalUserName={setGlobalUserName}
+                        />
+                      </React.Suspense>
+                    </div>
+                    <div className="tab-panel">
+                      <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
+                        <WithdrawTimer
+                          earnings={earnings}
+                          balances={balances}
+                          onBalanceChange={handleBalanceChange}
+                          prices={prices}
+                        />
+                      </React.Suspense>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </main>
-      )}
+          </main>
+        )}
 
-      {/* Footer */}
-      <footer className="footer">
-        <p>{t('app.footerLink')}</p>
-        <p className="footer-note">
-          {t('app.footerText')}{' '}
-          <a href="https://rollercoin.com/game" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
-            rollercoin.com
-          </a>
-        </p>
-      </footer>
+        {/* Footer */}
+        <footer className="footer">
+          <p>{t('app.footerLink')}</p>
+          <p className="footer-note">
+            {t('app.footerText')}{' '}
+            <a href="https://rollercoin.com/game" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
+              rollercoin.com
+            </a>
+          </p>
+        </footer>
+      </div>
+
+      {/* Right Side Ad - Desktop Only */}
+      <div className="side-ad side-ad-right">
+        <div className="side-ad-inner">
+          <iframe data-aa="2429577" src="//ad.a-ads.com/2429577/?size=160x600&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: '0 auto' }}
+            title="Ad Right" />
+        </div>
+      </div>
     </div>
   );
 }

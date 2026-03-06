@@ -73,10 +73,69 @@ body {
   background: var(--accent-primary);
 }
 
+/* App Layout Wrapper (3-column: left-ad | content | right-ad) */
+.app-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Side Ads - Desktop only */
+.side-ad {
+  display: none;
+  /* Hidden by default (mobile-first) */
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  z-index: 10;
+}
+
+.side-ad-inner {
+  width: 160px;
+  height: 600px;
+}
+
+/* Center ad in the gap between viewport edge and content edge */
+/* Gap = (100vw - 1200px) / 2 per side. Center 160px ad in that gap: */
+/* offset = (gap - 160px) / 2 = (50vw - 600px - 160px) / 2 = 25vw - 380px */
+.side-ad-left {
+  left: calc(25vw - 380px);
+}
+
+.side-ad-right {
+  right: calc(25vw - 380px);
+}
+
+/* Show side ads only on wide screens (1560px+ ensures 180px gap per side for 160px ads) */
+@media (min-width: 1560px) {
+  .side-ad {
+    display: block;
+  }
+
+  /* Hide mobile banner when side ads are visible */
+  .mobile-ad {
+    display: none;
+  }
+}
+
+/* Mobile Ad Banner - visible by default, hidden on desktop */
+.mobile-ad {
+  width: 100%;
+  margin: 0 auto 16px auto;
+  position: relative;
+  z-index: 5;
+}
+
 /* App Container */
 .app {
   max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  /* Prevent flex overflow */
   padding: 0 20px;
 }
 
