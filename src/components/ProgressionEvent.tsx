@@ -56,8 +56,8 @@ function getMinerImageUrl(filename: string): string {
     return `https://static.rollercoin.com/static/img/market/miners/${filename}.gif?v=1`;
 }
 
-function getRackImageUrl(filename: string): string {
-    return `https://static.rollercoin.com/static/img/market/racks/${filename}.gif?v=1`;
+function getRackImageUrl(id: string): string {
+    return `https://static.rollercoin.com/static/img/market/racks/${id}.png?v=1.0.4`;
 }
 
 // Get local image for known reward types
@@ -130,7 +130,7 @@ function getRewardDisplay(
                 return {
                     text: rack.name.en,
                     subText: `Rack Bonus:${rack.capacity * 5}%`,
-                    imageUrl: rack.filename ? getRackImageUrl(rack.filename) : undefined,
+                    imageUrl: getRackImageUrl(rack._id),
                 };
             }
             return { text: t('event.rewardTypes.rack'), subText: '' };
