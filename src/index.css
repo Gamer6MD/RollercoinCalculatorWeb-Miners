@@ -211,13 +211,13 @@ a:hover {
 
 @media (max-width: 768px) {
   .header-content {
-    flex-wrap: nowrap;
-    gap: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .header {
-    padding: 8px 0;
-    margin-bottom: 8px;
+    padding: 12px 0;
+    margin-bottom: 12px;
   }
 
   .header-title {
@@ -225,16 +225,20 @@ a:hover {
     transform: none;
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
   }
 
   .header-title h1 {
-    font-size: 13px;
-    white-space: nowrap;
+    font-size: 20px;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.2;
   }
 
   .app-main-logo {
-    width: 75px !important;
-    height: 75px !important;
+    width: 70px !important;
+    height: 70px !important;
   }
 
   .main-content {
@@ -1243,16 +1247,16 @@ a:hover {
 
   /* Header */
   .header {
-    padding: 16px 0;
-    margin-bottom: 16px;
+    padding: 12px 0;
+    margin-bottom: 12px;
   }
 
   .header-content {
-    gap: 6px;
+    gap: 8px;
   }
 
   .header-title h1 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .header-title svg {
@@ -1261,9 +1265,10 @@ a:hover {
   }
 
   .header-right-group {
-    gap: 6px;
+    gap: 12px;
     flex-wrap: nowrap;
-    width: auto;
+    width: 100%;
+    margin-top: 4px;
   }
 
   .lang-switcher {
@@ -1952,6 +1957,13 @@ a:hover {
   gap: 16px;
   flex-wrap: nowrap;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .header-right-group {
+    justify-content: center;
+    gap: 12px;
+  }
 }
 
 .lang-switcher {
