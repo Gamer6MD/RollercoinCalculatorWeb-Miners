@@ -602,8 +602,8 @@ function App() {
       {/* Left Side Ad - Desktop Only */}
       <div className="side-ad side-ad-left">
         <div className="side-ad-inner">
-          <iframe data-aa="2429577" src="//ad.a-ads.com/2429577/?size=160x600&background_color=1e2433&title_color=fffffe"
-            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: '0 auto' }}
+          <iframe data-aa="2429727" src="//ad.a-ads.com/2429727/?size=160x600&background_color=1e2433&title_color=f3f7f8&text_color=ccf4ff"
+            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: 'auto' }}
             title="Ad Left" />
         </div>
       </div>
@@ -684,8 +684,8 @@ function App() {
 
         {/* Mobile Ad Banner - Hidden on desktop where side ads show */}
         <div className="mobile-ad">
-          <iframe data-aa="2429578" src="//acceptable.a-ads.com/2429578/?size=Adaptive&background_color=1e2433&title_color=fffffe"
-            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: '0 auto' }}
+          <iframe data-aa="2429728" src="//acceptable.a-ads.com/2429728/?size=Adaptive&background_color=1e2433&title_color=ddcfcf&title_hover_color=ffffff&text_color=ffffff&link_color=ffffff&link_hover_color=ffffff"
+            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: 'auto' }}
             title="Ad Mobile" />
         </div>
 
@@ -811,8 +811,8 @@ function App() {
 
         {/* Mobile Ad Banner Bottom - Hidden on desktop */}
         <div className="mobile-ad">
-          <iframe data-aa="2429578" src="//acceptable.a-ads.com/2429578/?size=Adaptive&background_color=1e2433&title_color=fffffe"
-            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: '0 auto' }}
+          <iframe data-aa="2429728" src="//acceptable.a-ads.com/2429728/?size=Adaptive&background_color=1e2433&title_color=ddcfcf&title_hover_color=ffffff&text_color=ffffff&link_color=ffffff&link_hover_color=ffffff"
+            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: 'auto' }}
             title="Ad Mobile Bottom" />
         </div>
 
@@ -831,8 +831,8 @@ function App() {
       {/* Right Side Ad - Desktop Only */}
       <div className="side-ad side-ad-right">
         <div className="side-ad-inner">
-          <iframe data-aa="2429577" src="//ad.a-ads.com/2429577/?size=160x600&background_color=1e2433&title_color=fffffe"
-            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: '0 auto' }}
+          <iframe data-aa="2429727" src="//ad.a-ads.com/2429727/?size=160x600&background_color=1e2433&title_color=f3f7f8&text_color=ccf4ff"
+            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: 'auto' }}
             title="Ad Right" />
         </div>
       </div>
