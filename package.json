@@ -12,7 +12,7 @@
   },
   "reactSnap": {
     "source": "dist",
-    "publicPath": "/RollercoinCalculatorWeb/",
+    "publicPath": "/",
     "puppeteerArgs": [
       "--no-sandbox",
       "--disable-setuid-sandbox"

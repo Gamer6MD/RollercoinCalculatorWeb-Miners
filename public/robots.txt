@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://buraktemelkaya.github.io/RollercoinCalculatorWeb/sitemap.xml
+Sitemap: https://rollercoincalculator.app/sitemap.xml
