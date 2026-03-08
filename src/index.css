@@ -211,13 +211,13 @@ a:hover {
 
 @media (max-width: 768px) {
   .header-content {
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-wrap: nowrap;
+    gap: 6px;
   }
 
   .header {
-    padding: 12px 0;
-    margin-bottom: 12px;
+    padding: 8px 0;
+    margin-bottom: 8px;
   }
 
   .header-title {
@@ -225,20 +225,16 @@ a:hover {
     transform: none;
     flex: 1;
     min-width: 0;
-    display: flex;
-    align-items: center;
   }
 
   .header-title h1 {
-    font-size: 20px;
-    white-space: normal;
-    text-align: left;
-    line-height: 1.2;
+    font-size: 13px;
+    white-space: nowrap;
   }
 
   .app-main-logo {
-    width: 70px !important;
-    height: 70px !important;
+    width: 75px !important;
+    height: 75px !important;
   }
 
   .main-content {
@@ -820,11 +816,6 @@ a:hover {
   max-width: 780px;
 }
 
-.main-tabs.main-tabs-2 {
-  --tab-count: 2;
-  max-width: 400px;
-}
-
 .main-tabs.main-tabs-1 {
   --tab-count: 1;
   max-width: 260px;
@@ -917,7 +908,6 @@ a:hover {
 
 .tab-slider-track {
   display: flex;
-  align-items: flex-start;
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
@@ -926,17 +916,6 @@ a:hover {
   flex: 0 0 100%;
   min-width: 0;
   overflow: hidden;
-  height: auto;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.35s ease;
-}
-
-.tab-panel:not(.active) {
-  height: 0;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.35s ease, height 0s 0.35s, visibility 0s 0.35s;
 }
 
 @keyframes fadeIn {
@@ -1252,16 +1231,16 @@ a:hover {
 
   /* Header */
   .header {
-    padding: 12px 0;
-    margin-bottom: 12px;
+    padding: 16px 0;
+    margin-bottom: 16px;
   }
 
   .header-content {
-    gap: 8px;
+    gap: 6px;
   }
 
   .header-title h1 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .header-title svg {
@@ -1270,10 +1249,9 @@ a:hover {
   }
 
   .header-right-group {
-    gap: 12px;
+    gap: 6px;
     flex-wrap: nowrap;
-    width: 100%;
-    margin-top: 4px;
+    width: auto;
   }
 
   .lang-switcher {
@@ -1962,13 +1940,6 @@ a:hover {
   gap: 16px;
   flex-wrap: nowrap;
   flex-shrink: 0;
-}
-
-@media (max-width: 768px) {
-  .header-right-group {
-    justify-content: center;
-    gap: 12px;
-  }
 }
 
 .lang-switcher {

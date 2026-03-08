@@ -1,5 +1,4 @@
 import React from 'react';
-import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
 import trFlag from './assets/flags/tr.svg';
@@ -104,24 +103,9 @@ const TAB_ORDER: Record<Tab, number> = {
 
 import Notification from './components/Notification';
 
-function CalculatorArea() {
-  const { lang } = useParams<{ lang: string }>();
-  const navigate = useNavigate();
+function App() {
   const { t, i18n } = useTranslation();
   const [coins, setCoins] = useState<CoinData[]>([]);
-
-  // Force language sync with URL parmater on mount and param change
-  useEffect(() => {
-    if (lang && (lang === 'tr' || lang === 'en')) {
-      if (i18n.language !== lang) {
-        i18n.changeLanguage(lang);
-      }
-      localStorage.setItem('rollercoin_web_language', lang);
-    } else {
-      // Invalid lang parameter, redirect to detected language
-      navigate('/', { replace: true });
-    }
-  }, [lang, i18n, navigate]);
 
   // Notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -139,12 +123,16 @@ function CalculatorArea() {
     setNotification({ message, type });
   };
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   // Dynamic SEO: update lang on language change
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
-  const currentUrl = `https://rollercoincalculator.app/${i18n.language}`;
+  const currentUrl = `https://buraktemelkaya.github.io/RollercoinCalculatorWeb/`;
 
   const [userPower, setUserPower] = useState<HashPower | null>(null);
   const [earnings, setEarnings] = useState<EarningsResult[]>([]);
@@ -375,16 +363,6 @@ function CalculatorArea() {
     fetchPrices(allCryptos).then(setPrices).catch(console.error);
   };
 
-  // Synchronize 'league' state when 'apiLeagues' updates so latest block rewards are always used
-  useEffect(() => {
-    if (apiLeagues && apiLeagues.length > 0) {
-      const updatedLeague = apiLeagues.find(l => String(l.id) === String(league.id));
-      if (updatedLeague && updatedLeague !== league) {
-        setLeague(updatedLeague);
-      }
-    }
-  }, [apiLeagues, league.id, league]);
-
   // Auto-detect league when userPower or fetchMode changes
   useEffect(() => {
     // Skip auto-detect on initial load so cached league takes precedence
@@ -411,7 +389,7 @@ function CalculatorArea() {
           }
 
           if (foundLeague) {
-            if (foundLeague.id !== league.id || foundLeague !== league) {
+            if (foundLeague.id !== league.id) {
               setLeague(foundLeague);
             }
             return; // Skip power-based calculation
@@ -441,11 +419,11 @@ function CalculatorArea() {
 
       // Use API leagues if available, otherwise default LEAGUES
       const detectedLeague = getLeagueByPower(powerForLeague, apiLeagues || undefined);
-      if (detectedLeague.id !== league.id || detectedLeague !== league) {
+      if (detectedLeague.id !== league.id) {
         setLeague(detectedLeague);
       }
     }
-  }, [userPower, isAutoLeague, league, apiLeagues, fetchedUser, fetchMode]);
+  }, [userPower, isAutoLeague, league.id, apiLeagues, fetchedUser, fetchMode]);
 
   // Regenerate CoinData when league changes and we have raw API data
   useEffect(() => {
@@ -614,8 +592,8 @@ function CalculatorArea() {
       {/* Left Side Ad - Desktop Only */}
       <div className="side-ad side-ad-left">
         <div className="side-ad-inner">
-          <iframe data-aa="2429727" src="//ad.a-ads.com/2429727/?size=160x600&background_color=1e2433&title_color=f3f7f8&text_color=ccf4ff"
-            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: 'auto' }}
+          <iframe data-aa="2429577" src="//ad.a-ads.com/2429577/?size=160x600&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: '0 auto' }}
             title="Ad Left" />
         </div>
       </div>
@@ -646,9 +624,6 @@ function CalculatorArea() {
           <title>{t('seo.title')}</title>
           <meta name="description" content={t('seo.description')} />
           <link rel="canonical" href={currentUrl} />
-          <link rel="alternate" hrefLang="tr" href="https://rollercoincalculator.app/tr" />
-          <link rel="alternate" hrefLang="en" href="https://rollercoincalculator.app/en" />
-          <link rel="alternate" hrefLang="x-default" href="https://rollercoincalculator.app/" />
           <meta property="og:title" content={t('seo.title')} />
           <meta property="og:description" content={t('seo.description')} />
           <meta property="og:url" content={currentUrl} />
@@ -668,14 +643,14 @@ function CalculatorArea() {
             <div className="header-right-group">
               <div className="lang-switcher">
                 <button
-                  onClick={() => navigate(`/tr${window.location.hash}`)}
+                  onClick={() => changeLanguage('tr')}
                   className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
                 >
                   <img src={trFlag} alt="TR" className="flag-icon" />
                   <span className="lang-text">Türkçe</span>
                 </button>
                 <button
-                  onClick={() => navigate(`/en${window.location.hash}`)}
+                  onClick={() => changeLanguage('en')}
                   className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
                 >
                   <img src={gbFlag} alt="GB" className="flag-icon" />
@@ -699,14 +674,17 @@ function CalculatorArea() {
 
         {/* Mobile Ad Banner - Hidden on desktop where side ads show */}
         <div className="mobile-ad">
-          <iframe data-aa="2429728" src="//acceptable.a-ads.com/2429728/?size=Adaptive&background_color=1e2433&title_color=ddcfcf&title_hover_color=ffffff&text_color=ffffff&link_color=ffffff&link_hover_color=ffffff"
-            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: 'auto' }}
+          <iframe data-aa="2429578" src="//acceptable.a-ads.com/2429578/?size=Adaptive&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: '0 auto' }}
             title="Ad Mobile" />
         </div>
 
         {/* Main Content */}
         {showEventPage ? (
           <main className="main-content">
+            <a href="#" className="pe-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }}>
+              {t('event.backToCalc')}
+            </a>
             <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
               <ProgressionEvent />
             </React.Suspense>
@@ -783,7 +761,7 @@ function CalculatorArea() {
               >
                 {earnings.length > 0 && (
                   <>
-                    <div className={`tab-panel ${activeTab === 'calculator' ? 'active' : ''}`}>
+                    <div className="tab-panel">
                       <EarningsTable
                         earnings={earnings}
                         prices={prices}
@@ -791,7 +769,7 @@ function CalculatorArea() {
                         onShowNotification={showNotification}
                       />
                     </div>
-                    <div className={`tab-panel ${activeTab === 'simulator' ? 'active' : ''}`}>
+                    <div className="tab-panel">
                       <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
                         <PowerSimulator
                           currentLeague={league}
@@ -804,7 +782,7 @@ function CalculatorArea() {
                         />
                       </React.Suspense>
                     </div>
-                    <div className={`tab-panel ${activeTab === 'withdraw' ? 'active' : ''}`}>
+                    <div className="tab-panel">
                       <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
                         <WithdrawTimer
                           earnings={earnings}
@@ -823,8 +801,8 @@ function CalculatorArea() {
 
         {/* Mobile Ad Banner Bottom - Hidden on desktop */}
         <div className="mobile-ad">
-          <iframe data-aa="2429728" src="//acceptable.a-ads.com/2429728/?size=Adaptive&background_color=1e2433&title_color=ddcfcf&title_hover_color=ffffff&text_color=ffffff&link_color=ffffff&link_hover_color=ffffff"
-            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: 'auto' }}
+          <iframe data-aa="2429578" src="//acceptable.a-ads.com/2429578/?size=Adaptive&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: '70%', height: 'auto', overflow: 'hidden', display: 'block', margin: '0 auto' }}
             title="Ad Mobile Bottom" />
         </div>
 
@@ -843,34 +821,12 @@ function CalculatorArea() {
       {/* Right Side Ad - Desktop Only */}
       <div className="side-ad side-ad-right">
         <div className="side-ad-inner">
-          <iframe data-aa="2429727" src="//ad.a-ads.com/2429727/?size=160x600&background_color=1e2433&title_color=f3f7f8&text_color=ccf4ff"
-            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: 'auto' }}
+          <iframe data-aa="2429577" src="//ad.a-ads.com/2429577/?size=160x600&background_color=1e2433&title_color=fffffe"
+            style={{ border: 0, padding: 0, width: 160, height: 600, overflow: 'hidden', display: 'block', margin: '0 auto' }}
             title="Ad Right" />
         </div>
       </div>
     </div>
-  );
-}
-
-function AutoRedirect() {
-  const getBrowserLanguage = () => {
-    const saved = localStorage.getItem('rollercoin_web_language');
-    if (saved && (saved === 'tr' || saved === 'en')) {
-      return saved;
-    }
-    const lang = navigator.language || (navigator as any).userLanguage || 'en';
-    return lang.toLowerCase().startsWith('tr') ? 'tr' : 'en';
-  };
-  return <Navigate to={`/${getBrowserLanguage()}${window.location.hash}`} replace />;
-}
-
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<AutoRedirect />} />
-      <Route path="/:lang" element={<CalculatorArea />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
   );
 }
 
