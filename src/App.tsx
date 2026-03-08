@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import trFlag from './assets/flags/tr.svg';
 import gbFlag from './assets/flags/gb.svg';
 import appLogo from './assets/logo.png';
+import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
 // ... existing imports ...
 
 import { CoinData, HashPower, EarningsResult } from './types';
@@ -11,7 +12,7 @@ import { calculateAllEarnings } from './utils/calculator';
 import { getLeagueByPower, getBlockRewardsForLeague } from './utils/leagueHelper';
 import { LEAGUES, LeagueInfo } from './data/leagues';
 import { ApiLeagueData } from './types/api';
-import { convertApiLeagueToCoinData } from './services/leagueApi';
+import { convertApiLeagueToCoinData, getLeaguesFromApi, fetchLeaguesFromApi } from './services/leagueApi';
 import { fetchUserFromApi } from './services/userApi';
 import { autoScalePower } from './utils/powerParser';
 import { COIN_ICONS } from './utils/constants';
@@ -103,9 +104,44 @@ const TAB_ORDER: Record<Tab, number> = {
 
 import Notification from './components/Notification';
 
-function App() {
+function AutoRedirect() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check localStorage first
+    const savedLang = localStorage.getItem('rollercoin_web_language');
+    if (savedLang && (savedLang === 'tr' || savedLang === 'en')) {
+      navigate(`/${savedLang}`, { replace: true });
+      return;
+    }
+
+    // Otherwise detect from browser
+    const browserLang = navigator.language.split('-')[0];
+    const targetLang = browserLang === 'tr' ? 'tr' : 'en';
+    navigate(`/${targetLang}`, { replace: true });
+  }, [navigate]);
+
+  return null;
+}
+
+function CalculatorArea() {
+  const { lang } = useParams<{ lang: string }>();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [coins, setCoins] = useState<CoinData[]>([]);
+
+  // Force language sync with URL parmater on mount and param change
+  useEffect(() => {
+    if (lang && (lang === 'tr' || lang === 'en')) {
+      if (i18n.language !== lang) {
+        i18n.changeLanguage(lang);
+      }
+      localStorage.setItem('rollercoin_web_language', lang);
+    } else {
+      // Invalid lang parameter, redirect to detected language
+      navigate('/', { replace: true });
+    }
+  }, [lang, i18n, navigate]);
 
   // Notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -123,14 +159,42 @@ function App() {
     setNotification({ message, type });
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
 
-  // Dynamic SEO: update lang on language change
+// Dynamic SEO: update lang on language change
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
+
+  /** 
+   * NEW logic to fetch API leagues correctly on mount
+   * This ensures the block reward calculation is correct from the start
+   */
+  const fetchApiData = async () => {
+    try {
+      const rawLeagues = await fetchLeaguesFromApi();
+      const processedLeagues = await getLeaguesFromApi();
+
+      setApiLeagues(processedLeagues);
+      setRawApiData(rawLeagues);
+
+      // Cache the results
+      localStorage.setItem(STORAGE_KEYS.API_LEAGUES, JSON.stringify(processedLeagues));
+      localStorage.setItem('rollercoin_web_raw_api_data', JSON.stringify(rawLeagues));
+
+      // Initial sync: set current league to the one from API if found
+      const currentLeagueId = localStorage.getItem(STORAGE_KEYS.LEAGUE_ID) || LEAGUES[0].id;
+      const foundLeague = processedLeagues.find(l => String(l.id) === String(currentLeagueId));
+      if (foundLeague) {
+        setLeague(foundLeague);
+      }
+    } catch (error) {
+      console.error('Failed to fetch API leagues:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchApiData();
+  }, []);
 
   const currentUrl = `https://buraktemelkaya.github.io/RollercoinCalculatorWeb/`;
 
@@ -363,6 +427,17 @@ function App() {
     fetchPrices(allCryptos).then(setPrices).catch(console.error);
   };
 
+  // Synchronize 'league' state when 'apiLeagues' updates so latest block rewards are always used
+  useEffect(() => {
+    if (apiLeagues && apiLeagues.length > 0) {
+      const updatedLeague = apiLeagues.find(l => String(l.id) === String(league.id));
+      if (updatedLeague && updatedLeague !== league) {
+        setLeague(updatedLeague);
+      }
+    }
+  }, [apiLeagues, league.id, league]);
+
+
   // Auto-detect league when userPower or fetchMode changes
   useEffect(() => {
     // Skip auto-detect on initial load so cached league takes precedence
@@ -389,7 +464,7 @@ function App() {
           }
 
           if (foundLeague) {
-            if (foundLeague.id !== league.id) {
+            if (foundLeague.id !== league.id || foundLeague !== league) {
               setLeague(foundLeague);
             }
             return; // Skip power-based calculation
@@ -419,11 +494,11 @@ function App() {
 
       // Use API leagues if available, otherwise default LEAGUES
       const detectedLeague = getLeagueByPower(powerForLeague, apiLeagues || undefined);
-      if (detectedLeague.id !== league.id) {
+      if (detectedLeague.id !== league.id || detectedLeague !== league) {
         setLeague(detectedLeague);
       }
     }
-  }, [userPower, isAutoLeague, league.id, apiLeagues, fetchedUser, fetchMode]);
+  }, [userPower, isAutoLeague, league, apiLeagues, fetchedUser, fetchMode]);
 
   // Regenerate CoinData when league changes and we have raw API data
   useEffect(() => {
@@ -641,22 +716,24 @@ function App() {
               <h1>{t('app.title')}</h1>
             </div>
             <div className="header-right-group">
-              <div className="lang-switcher">
-                <button
-                  onClick={() => changeLanguage('tr')}
-                  className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
-                >
-                  <img src={trFlag} alt="TR" className="flag-icon" />
-                  <span className="lang-text">Türkçe</span>
-                </button>
-                <button
-                  onClick={() => changeLanguage('en')}
-                  className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
-                >
-                  <img src={gbFlag} alt="GB" className="flag-icon" />
-                  <span className="lang-text">English</span>
-                </button>
-              </div>
+                <div className="lang-switcher">
+                  <button
+                    className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
+                    onClick={() => navigate('/tr' + window.location.hash)}
+                    title="Türkçe"
+                  >
+                    <img src={trFlag} alt="TR" className="flag-icon" />
+                    <span className="lang-text">Türkçe</span>
+                  </button>
+                  <button
+                    className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
+                    onClick={() => navigate('/en' + window.location.hash)}
+                    title="English"
+                  >
+                    <img src={gbFlag} alt="EN" className="flag-icon" />
+                    <span className="lang-text">English</span>
+                  </button>
+                </div>
               <a
                 href="https://github.com/BurakTemelkaya/RollercoinCalculatorWeb"
                 target="_blank"
@@ -827,6 +904,16 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<AutoRedirect />} />
+      <Route path="/:lang" element={<CalculatorArea />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
