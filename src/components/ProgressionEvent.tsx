@@ -347,6 +347,9 @@ export default function ProgressionEvent() {
                 <div className="pe-loading">
                     <span className="spinner" />
                     <p>{t('event.loading')}</p>
+                    <a href="#" className="pe-header-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }} style={{ marginTop: '20px' }}>
+                        {t('event.backToCalc')}
+                    </a>
                 </div>
             </div>
         );
@@ -358,12 +361,17 @@ export default function ProgressionEvent() {
                 <div className="pe-error">
                     <span className="pe-error-icon">⚠️</span>
                     <p>{t('event.fetchError')}: {error}</p>
-                    <button
-                        className="btn-primary"
-                        onClick={() => window.location.reload()}
-                    >
-                        {t('event.retry')}
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
+                        <button
+                            className="btn-primary"
+                            onClick={() => window.location.reload()}
+                        >
+                            {t('event.retry')}
+                        </button>
+                        <a href="#" className="btn-secondary" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }} style={{ padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                            {t('event.backToCalc')}
+                        </a>
+                    </div>
                 </div>
             </div>
         );

@@ -116,6 +116,7 @@ function CalculatorArea() {
       if (i18n.language !== lang) {
         i18n.changeLanguage(lang);
       }
+      localStorage.setItem('rollercoin_web_language', lang);
     } else {
       // Invalid lang parameter, redirect to detected language
       navigate('/', { replace: true });
@@ -667,14 +668,14 @@ function CalculatorArea() {
             <div className="header-right-group">
               <div className="lang-switcher">
                 <button
-                  onClick={() => navigate('/tr')}
+                  onClick={() => navigate(`/tr${window.location.hash}`)}
                   className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
                 >
                   <img src={trFlag} alt="TR" className="flag-icon" />
                   <span className="lang-text">Türkçe</span>
                 </button>
                 <button
-                  onClick={() => navigate('/en')}
+                  onClick={() => navigate(`/en${window.location.hash}`)}
                   className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
                 >
                   <img src={gbFlag} alt="GB" className="flag-icon" />
@@ -853,10 +854,14 @@ function CalculatorArea() {
 
 function AutoRedirect() {
   const getBrowserLanguage = () => {
+    const saved = localStorage.getItem('rollercoin_web_language');
+    if (saved && (saved === 'tr' || saved === 'en')) {
+      return saved;
+    }
     const lang = navigator.language || (navigator as any).userLanguage || 'en';
     return lang.toLowerCase().startsWith('tr') ? 'tr' : 'en';
   };
-  return <Navigate to={`/${getBrowserLanguage()}`} replace />;
+  return <Navigate to={`/${getBrowserLanguage()}${window.location.hash}`} replace />;
 }
 
 function App() {
