@@ -22,8 +22,9 @@ i18n
             escapeValue: false, // not needed for react as it escapes by default
         },
         detection: {
-            order: ['localStorage', 'cookie', 'navigator', 'queryString', 'htmlTag', 'path', 'subdomain'],
-            caches: ['localStorage', 'cookie'],
+            // Priority: URL path first, then localStorage, then defaults
+            order: ['path', 'localStorage', 'navigator', 'htmlTag'],
+            caches: ['localStorage'],
         },
     });
 

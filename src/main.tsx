@@ -5,12 +5,16 @@ import './index.css'
 import './i18n'
 import App from './App.tsx'
 
+import { BrowserRouter } from 'react-router-dom'
+
 const container = document.getElementById('root')!
 
 createRoot(container).render(
   <StrictMode>
     <HelmetProvider>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </HelmetProvider>
   </StrictMode>
 )

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
 import trFlag from './assets/flags/tr.svg';
@@ -103,9 +104,23 @@ const TAB_ORDER: Record<Tab, number> = {
 
 import Notification from './components/Notification';
 
-function App() {
+function CalculatorArea() {
+  const { lang } = useParams<{ lang: string }>();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [coins, setCoins] = useState<CoinData[]>([]);
+
+  // Force language sync with URL parmater on mount and param change
+  useEffect(() => {
+    if (lang && (lang === 'tr' || lang === 'en')) {
+      if (i18n.language !== lang) {
+        i18n.changeLanguage(lang);
+      }
+    } else {
+      // Invalid lang parameter, redirect to detected language
+      navigate('/', { replace: true });
+    }
+  }, [lang, i18n, navigate]);
 
   // Notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -123,16 +138,12 @@ function App() {
     setNotification({ message, type });
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
-
   // Dynamic SEO: update lang on language change
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
-  const currentUrl = `https://rollercoincalculator.app/`;
+  const currentUrl = `https://rollercoincalculator.app/${i18n.language}`;
 
   const [userPower, setUserPower] = useState<HashPower | null>(null);
   const [earnings, setEarnings] = useState<EarningsResult[]>([]);
@@ -634,6 +645,9 @@ function App() {
           <title>{t('seo.title')}</title>
           <meta name="description" content={t('seo.description')} />
           <link rel="canonical" href={currentUrl} />
+          <link rel="alternate" hrefLang="tr" href="https://rollercoincalculator.app/tr" />
+          <link rel="alternate" hrefLang="en" href="https://rollercoincalculator.app/en" />
+          <link rel="alternate" hrefLang="x-default" href="https://rollercoincalculator.app/" />
           <meta property="og:title" content={t('seo.title')} />
           <meta property="og:description" content={t('seo.description')} />
           <meta property="og:url" content={currentUrl} />
@@ -653,14 +667,14 @@ function App() {
             <div className="header-right-group">
               <div className="lang-switcher">
                 <button
-                  onClick={() => changeLanguage('tr')}
+                  onClick={() => navigate('/tr')}
                   className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
                 >
                   <img src={trFlag} alt="TR" className="flag-icon" />
                   <span className="lang-text">Türkçe</span>
                 </button>
                 <button
-                  onClick={() => changeLanguage('en')}
+                  onClick={() => navigate('/en')}
                   className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
                 >
                   <img src={gbFlag} alt="GB" className="flag-icon" />
@@ -834,6 +848,24 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function AutoRedirect() {
+  const getBrowserLanguage = () => {
+    const lang = navigator.language || (navigator as any).userLanguage || 'en';
+    return lang.toLowerCase().startsWith('tr') ? 'tr' : 'en';
+  };
+  return <Navigate to={`/${getBrowserLanguage()}`} replace />;
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<AutoRedirect />} />
+      <Route path="/:lang" element={<CalculatorArea />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
