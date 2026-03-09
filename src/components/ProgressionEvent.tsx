@@ -395,7 +395,7 @@ export default function ProgressionEvent() {
 
                 <div className="pe-header-actions pe-header-right">
                     <div className="pe-header-time">
-                        {t('event.leftTime')}: <strong>{timeLeft}</strong>
+                        {t('event.leftTime')}:&nbsp;<strong>{timeLeft}</strong>
                     </div>
                 </div>
             </div>

@@ -175,10 +175,18 @@ function CalculatorArea() {
   const [balances, setBalances] = useState<Record<string, number>>({});
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [activeTab, setActiveTab] = useState<Tab>('calculator');
+  const [collapsedTabs, setCollapsedTabs] = useState<Set<Tab>>(new Set(['simulator', 'withdraw']));
 
   const handleTabChange = (newTab: Tab) => {
     if (newTab === activeTab) return;
+    const oldTab = activeTab;
+    // Uncollapse incoming panel immediately so it's visible during slide
+    setCollapsedTabs(prev => { const next = new Set(prev); next.delete(newTab); return next; });
     setActiveTab(newTab);
+    // Collapse outgoing panel after animation completes
+    setTimeout(() => {
+      setCollapsedTabs(prev => { const next = new Set(prev); next.add(oldTab); return next; });
+    }, 400);
   };
 
   // League State
@@ -813,7 +821,7 @@ function CalculatorArea() {
               >
                 {earnings.length > 0 && (
                   <>
-                    <div className="tab-panel">
+                    <div className={`tab-panel${collapsedTabs.has('calculator') ? ' collapsed' : ''}`}>
                       <EarningsTable
                         earnings={earnings}
                         prices={prices}
@@ -821,7 +829,7 @@ function CalculatorArea() {
                         onShowNotification={showNotification}
                       />
                     </div>
-                    <div className="tab-panel">
+                    <div className={`tab-panel${collapsedTabs.has('simulator') ? ' collapsed' : ''}`}>
                       <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
                         <PowerSimulator
                           currentLeague={league}
@@ -834,7 +842,7 @@ function CalculatorArea() {
                         />
                       </React.Suspense>
                     </div>
-                    <div className="tab-panel">
+                    <div className={`tab-panel${collapsedTabs.has('withdraw') ? ' collapsed' : ''}`}>
                       <React.Suspense fallback={<div className="tab-loading-placeholder"><span className="spinner"></span></div>}>
                         <WithdrawTimer
                           earnings={earnings}
