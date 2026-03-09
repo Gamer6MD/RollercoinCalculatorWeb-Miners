@@ -958,6 +958,100 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Static Pages (About / Privacy) */
+.static-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+.static-back-link {
+  margin-bottom: 24px;
+}
+
+.static-back-link a {
+  color: #818cf8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.static-back-link a:hover {
+  color: #a5b4fc;
+  text-decoration: underline;
+}
+
+.static-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.static-content h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 32px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.static-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #a5b4fc;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.static-content p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+.static-content ul {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 12px;
+  padding-left: 24px;
+}
+
+.static-content ul li {
+  margin-bottom: 6px;
+}
+
+.static-content blockquote {
+  border-left: 3px solid var(--accent-primary);
+  background: var(--bg-card);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 14px 18px;
+  margin: 24px 0;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.static-content a {
+  color: #818cf8;
+  text-decoration: underline;
+}
+
+.static-content a:hover {
+  color: #a5b4fc;
+}
+
+.static-meta {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 20px !important;
+}
+
 /* Table Section Styles */
 .section-header-row {
   display: flex;

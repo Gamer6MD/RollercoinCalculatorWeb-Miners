@@ -27,6 +27,8 @@ const WithdrawTimer = React.lazy(() => import('./components/WithdrawTimer'));
 const PowerSimulator = React.lazy(() => import('./components/PowerSimulator'));
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
 const ProgressionEvent = React.lazy(() => import('./components/ProgressionEvent'));
+const AboutPage = React.lazy(() => import('./components/AboutPage'));
+const PrivacyPage = React.lazy(() => import('./components/PrivacyPage'));
 
 import './index.css';
 
@@ -865,6 +867,11 @@ function CalculatorArea() {
               rollercoin.com
             </a>
           </p>
+          <p className="footer-note">
+            <a href={`/${i18n.language}/about`}>{i18n.language === 'tr' ? 'Hakkımızda' : 'About Us'}</a>
+            {' · '}
+            <a href={`/${i18n.language}/privacy`}>{i18n.language === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}</a>
+          </p>
         </footer>
       </div>
 
@@ -885,6 +892,8 @@ function App() {
     <Routes>
       <Route path="/" element={<AutoRedirect />} />
       <Route path="/:lang" element={<CalculatorArea />} />
+      <Route path="/:lang/about" element={<React.Suspense fallback={null}><AboutPage /></React.Suspense>} />
+      <Route path="/:lang/privacy" element={<React.Suspense fallback={null}><PrivacyPage /></React.Suspense>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
