@@ -8,7 +8,7 @@
     transition: all 0.3s ease;
     margin-bottom: 24px;
     z-index: 100;
-    /* Increased z-index */
+    overflow: hidden;
 }
 
 .data-input-section.expanded {
@@ -18,33 +18,51 @@
     /* Even higher when expanded */
 }
 
-.section-header {
+.data-input-section > .section-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 16px 20px;
-    background: var(--bg-tertiary);
+    background: #252b3b;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     border-bottom: 1px solid transparent;
+    position: relative;
+    min-height: 68px;
+    border-radius: var(--radius-lg);
 }
 
-.data-input-section.expanded .section-header {
+.data-input-section.expanded > .section-header {
     border-bottom-color: var(--border-color);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-.section-header:hover {
-    background: var(--bg-card-hover);
+.data-input-section > .section-header:hover {
+    background: color-mix(in srgb, #252b3b 82%, black 18%);
 }
 
-.header-left {
+/* header-left is always absolute — no position switch = no teleport */
+.data-input-section > .section-header > .header-left {
     display: flex;
     align-items: center;
     gap: 12px;
+    position: absolute;
+    /* Default (expanded OR collapsed-no-data): centered */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.section-title {
+/* ONLY when collapsed with chips (data loaded): animate to the left */
+.data-input-section.collapsed > .section-header:has(.collapsed-summary) > .header-left {
+    left: 20px;
+    transform: translateX(0);
+}
+
+.data-input-section .section-title {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -54,6 +72,9 @@
     text-transform: uppercase;
     margin: 0;
     letter-spacing: 0.5px;
+    background: none;
+    padding: 0;
+    border-bottom: none;
 }
 
 .section-icon {

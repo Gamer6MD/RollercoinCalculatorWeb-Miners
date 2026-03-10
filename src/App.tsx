@@ -371,7 +371,10 @@ function CalculatorArea() {
       const savedFetchedUser = localStorage.getItem('rollercoin_web_fetched_user');
       if (savedFetchedUser) setFetchedUser(JSON.parse(savedFetchedUser));
       if (savedBalances) setBalances(JSON.parse(savedBalances));
-      if (savedTab === 'calculator' || savedTab === 'withdraw' || savedTab === 'simulator') setActiveTab(savedTab);
+      if (savedTab === 'calculator' || savedTab === 'withdraw' || savedTab === 'simulator') {
+        setActiveTab(savedTab);
+        setCollapsedTabs(prev => { const next = new Set(prev); next.delete(savedTab); return next; });
+      }
       if (savedApiLeagues) setApiLeagues(JSON.parse(savedApiLeagues));
       const savedRawApiData = localStorage.getItem('rollercoin_web_raw_api_data');
       if (savedRawApiData) setRawApiData(JSON.parse(savedRawApiData));
