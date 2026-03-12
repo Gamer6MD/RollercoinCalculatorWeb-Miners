@@ -725,7 +725,7 @@ function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: b
               <div className="lang-switcher">
                 <button
                   className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
-                  onClick={() => navigate('/tr' + window.location.hash)}
+                  onClick={() => navigate('/tr' + (showEventPageRoute ? '/event' : ''))}
                   title="Türkçe"
                 >
                   <img src={trFlag} alt="TR" className="flag-icon" />
@@ -733,7 +733,7 @@ function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: b
                 </button>
                 <button
                   className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
-                  onClick={() => navigate('/en' + window.location.hash)}
+                  onClick={() => navigate('/en' + (showEventPageRoute ? '/event' : ''))}
                   title="English"
                 >
                   <img src={gbFlag} alt="EN" className="flag-icon" />
