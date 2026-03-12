@@ -149,7 +149,7 @@ function AutoRedirect() {
   return null;
 }
 
-function CalculatorArea() {
+function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: boolean }) {
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -171,27 +171,21 @@ function CalculatorArea() {
   // Notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  // Hash-based routing for event page
-  const [showEventPage, setShowEventPage] = useState(() => window.location.hash === '#currentpe');
-
-  useEffect(() => {
-    const onHashChange = () => setShowEventPage(window.location.hash === '#currentpe');
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+  // Use the route prop directly instead of hash-based routing
+  const showEventPage = showEventPageRoute;
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotification({ message, type });
   };
 
 
-// Dynamic SEO: update lang on language change
+  // Dynamic SEO: update lang on language change
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
 
-  const currentUrl = `https://rollercoincalculator.app/`;
+  const currentUrl = `https://rollercoincalculator.app/${lang || i18n.language}${showEventPageRoute ? '/event' : ''}`;
 
   const [userPower, setUserPower] = useState<HashPower | null>(null);
   const [earnings, setEarnings] = useState<EarningsResult[]>([]);
@@ -338,7 +332,7 @@ function CalculatorArea() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const CACHE_VERSION_KEY = 'rollercoin_web_cache_version';
-  const CURRENT_CACHE_VERSION = '1.0.3';
+  const CURRENT_CACHE_VERSION = '1.0.4';
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -728,24 +722,24 @@ function CalculatorArea() {
               <h1>{t('app.title')}</h1>
             </div>
             <div className="header-right-group">
-                <div className="lang-switcher">
-                  <button
-                    className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
-                    onClick={() => navigate('/tr' + window.location.hash)}
-                    title="Türkçe"
-                  >
-                    <img src={trFlag} alt="TR" className="flag-icon" />
-                    <span className="lang-text">Türkçe</span>
-                  </button>
-                  <button
-                    className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
-                    onClick={() => navigate('/en' + window.location.hash)}
-                    title="English"
-                  >
-                    <img src={gbFlag} alt="EN" className="flag-icon" />
-                    <span className="lang-text">English</span>
-                  </button>
-                </div>
+              <div className="lang-switcher">
+                <button
+                  className={`lang-btn ${i18n.language === 'tr' ? 'active' : ''}`}
+                  onClick={() => navigate('/tr' + window.location.hash)}
+                  title="Türkçe"
+                >
+                  <img src={trFlag} alt="TR" className="flag-icon" />
+                  <span className="lang-text">Türkçe</span>
+                </button>
+                <button
+                  className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
+                  onClick={() => navigate('/en' + window.location.hash)}
+                  title="English"
+                >
+                  <img src={gbFlag} alt="EN" className="flag-icon" />
+                  <span className="lang-text">English</span>
+                </button>
+              </div>
               <a
                 href="https://github.com/BurakTemelkaya/RollercoinCalculatorWeb"
                 target="_blank"
@@ -779,10 +773,10 @@ function CalculatorArea() {
           <main className="main-content">
             {/* Event Page Link (Top) */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <a href="#currentpe" className="pe-event-link" style={{ margin: 0 }}>
+              <Link to={`/${lang}/event`} className="pe-event-link" style={{ margin: 0 }}>
                 <span className="tab-icon">🎉</span>
                 {t('tabs.event')}
-              </a>
+              </Link>
             </div>
 
             {/* Data Input Form */}
@@ -926,6 +920,7 @@ function App() {
     <Routes>
       <Route path="/" element={<AutoRedirect />} />
       <Route path="/:lang" element={<CalculatorArea />} />
+      <Route path="/:lang/event" element={<CalculatorArea showEventPageRoute={true} />} />
       <Route path="/:lang/about" element={<React.Suspense fallback={null}><AboutPage /></React.Suspense>} />
       <Route path="/:lang/privacy" element={<React.Suspense fallback={null}><PrivacyPage /></React.Suspense>} />
       <Route path="*" element={<Navigate to="/" replace />} />

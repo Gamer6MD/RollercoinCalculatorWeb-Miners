@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
 import { fetchProgressionEvent, type ParsedProgressionEvent } from '../services/progressionEventApi';
 import type {
     ProgressionReward,
@@ -152,6 +153,7 @@ function getRewardDisplay(
 }
 
 export default function ProgressionEvent() {
+    const { lang } = useParams<{ lang: string }>();
     const { t } = useTranslation();
     const [eventData, setEventData] = useState<ParsedProgressionEvent | null>(null);
     const [loading, setLoading] = useState(true);
@@ -347,9 +349,9 @@ export default function ProgressionEvent() {
                 <div className="pe-loading">
                     <span className="spinner" />
                     <p>{t('event.loading')}</p>
-                    <a href="#" className="pe-header-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }} style={{ marginTop: '20px' }}>
+                    <Link to={`/${lang}`} className="pe-header-back-btn" style={{ marginTop: '20px' }}>
                         {t('event.backToCalc')}
-                    </a>
+                    </Link>
                 </div>
             </div>
         );
@@ -368,9 +370,9 @@ export default function ProgressionEvent() {
                         >
                             {t('event.retry')}
                         </button>
-                        <a href="#" className="btn-secondary" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }} style={{ padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                        <Link to={`/${lang}`} className="btn-secondary" style={{ padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                             {t('event.backToCalc')}
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -386,9 +388,9 @@ export default function ProgressionEvent() {
             {/* Event Header */}
             <div className="pe-header">
                 <div className="pe-header-actions pe-header-left">
-                    <a href="#" className="pe-header-back-btn" onClick={(e) => { e.preventDefault(); window.location.hash = ''; }}>
+                    <Link to={`/${lang}`} className="pe-header-back-btn">
                         {t('event.backToCalc')}
-                    </a>
+                    </Link>
                 </div>
 
                 <h2 className="pe-title">{event.title.en}</h2>

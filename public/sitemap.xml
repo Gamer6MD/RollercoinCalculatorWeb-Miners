@@ -70,4 +70,24 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/privacy"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/privacy"/>
   </url>
+  <!-- Event - Turkish -->
+  <url>
+    <loc>https://rollercoincalculator.app/tr/event</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/event"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/event"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/event"/>
+  </url>
+  <!-- Event - English -->
+  <url>
+    <loc>https://rollercoincalculator.app/en/event</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/event"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/event"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/event"/>
+  </url>
 </urlset>
