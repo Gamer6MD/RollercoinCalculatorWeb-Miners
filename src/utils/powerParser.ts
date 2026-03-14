@@ -124,17 +124,28 @@ export function parsePowerUnit(baseValue: number): PowerUnit {
 }
 
 /**
- * Calculate power ratio (user / league)
+ * Calculate power share ratio (user / league)
  */
 export function powerRatio(userPower: HashPower, leaguePower: HashPower): number {
     const userBase = toBaseUnit(userPower);
     const leagueBase = toBaseUnit(leaguePower);
 
-    if (leagueBase === 0) return 0;
+    // If both are 0, user gets 0% share
+    if (leagueBase === 0 && userBase === 0) return 0;
+    
+    // If the coin has 0 power currently, but user has power, they would get 100% of the block
+    if (leagueBase === 0) return 1;
+
+    // The user's power is supposed to be *part* of the league power.
+    // If we're doing a "what-if" scenario where the user applies their power 
+    // to a coin they aren't currently mining (or a coin with very low total power),
+    // the new total network power for that coin would be its existing power + the user's power.
+    if (userBase > leagueBase) {
+        return userBase / (leagueBase + userBase);
+    }
 
     return userBase / leagueBase;
 }
-
 
 
 /**
