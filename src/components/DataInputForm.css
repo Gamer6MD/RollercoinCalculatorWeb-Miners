@@ -513,7 +513,7 @@
 .username-help-tooltip {
     position: absolute;
     right: 0;
-    top: calc(100% + 8px);
+    bottom: calc(100% + 8px);
     width: min(360px, 92vw);
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -523,7 +523,7 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-6px);
+    transform: translateY(6px);
     transition: all 0.2s ease;
     z-index: 999;
 }
