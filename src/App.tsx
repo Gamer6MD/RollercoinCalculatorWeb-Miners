@@ -26,6 +26,7 @@ import { Helmet } from 'react-helmet-async';
 const WithdrawTimer = React.lazy(() => import('./components/WithdrawTimer'));
 const PowerSimulator = React.lazy(() => import('./components/PowerSimulator'));
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
+const ColumnSettingsModal = React.lazy(() => import('./components/ColumnSettingsModal'));
 const ProgressionEvent = React.lazy(() => import('./components/ProgressionEvent'));
 const AboutPage = React.lazy(() => import('./components/AboutPage'));
 const PrivacyPage = React.lazy(() => import('./components/PrivacyPage'));
@@ -41,6 +42,9 @@ const STORAGE_KEYS = {
   LEAGUE_ID: 'rollercoin_web_league_id',
   AUTO_LEAGUE: 'rollercoin_web_auto_league',
   API_LEAGUES: 'rollercoin_web_api_leagues',
+  TABLE_COLUMNS: 'rollercoin_web_table_columns',
+  CUSTOM_PERIOD_DAYS: 'rollercoin_web_custom_period_days',
+  CUSTOM_PERIOD_HOURS: 'rollercoin_web_custom_period_hours',
 };
 
 const PRICES_CACHE_KEY = 'rollercoin_web_prices_cache';
@@ -330,6 +334,15 @@ function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: b
     "RLT": 596,
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [columnModalOpen, setColumnModalOpen] = useState(false);
+
+  // Table column configuration state
+  type TableColumnType = 'blockReward' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'custom';
+  const [visibleColumns, setVisibleColumns] = useState<Set<TableColumnType>>(
+    new Set(['daily', 'weekly', 'monthly'])
+  );
+  const [customPeriodDays, setCustomPeriodDays] = useState<number>(0);
+  const [customPeriodHours, setCustomPeriodHours] = useState<number>(0);
 
   const CACHE_VERSION_KEY = 'rollercoin_web_cache_version';
   const CURRENT_CACHE_VERSION = '1.0.4';
@@ -377,6 +390,23 @@ function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: b
       if (savedDurations) {
         setBlockDurations(JSON.parse(savedDurations));
       }
+
+      // Load table column configuration
+      const savedTableColumns = localStorage.getItem(STORAGE_KEYS.TABLE_COLUMNS);
+      if (savedTableColumns) {
+        try {
+          const columnArray = JSON.parse(savedTableColumns);
+          setVisibleColumns(new Set(columnArray));
+        } catch (_) {
+          // Use default if JSON parse fails
+        }
+      }
+
+      // Load custom period configuration
+      const savedCustomDays = localStorage.getItem(STORAGE_KEYS.CUSTOM_PERIOD_DAYS);
+      if (savedCustomDays) setCustomPeriodDays(parseInt(savedCustomDays, 10));
+      const savedCustomHours = localStorage.getItem(STORAGE_KEYS.CUSTOM_PERIOD_HOURS);
+      if (savedCustomHours) setCustomPeriodHours(parseInt(savedCustomHours, 10));
 
       if (savedAutoLeague !== null) {
         setIsAutoLeague(savedAutoLeague === 'true');
@@ -688,6 +718,25 @@ function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: b
             onSave={handleSaveDurations}
             coins={coins.length > 0 ? coins.map(c => c.displayName) : ['BTC', 'ETH', 'DOGE', 'BNB', 'MATIC', 'SOL', 'TRX', 'LTC', 'RST']}
           />
+          <ColumnSettingsModal
+            isOpen={columnModalOpen}
+            onClose={() => setColumnModalOpen(false)}
+            visibleColumns={visibleColumns}
+            onVisibleColumnsChange={(newCols) => {
+              setVisibleColumns(newCols);
+              localStorage.setItem(STORAGE_KEYS.TABLE_COLUMNS, JSON.stringify([...newCols]));
+            }}
+            customPeriodDays={customPeriodDays}
+            customPeriodHours={customPeriodHours}
+            onCustomPeriodDaysChange={(days) => {
+              setCustomPeriodDays(days);
+              localStorage.setItem(STORAGE_KEYS.CUSTOM_PERIOD_DAYS, days.toString());
+            }}
+            onCustomPeriodHoursChange={(hours) => {
+              setCustomPeriodHours(hours);
+              localStorage.setItem(STORAGE_KEYS.CUSTOM_PERIOD_HOURS, hours.toString());
+            }}
+          />
         </React.Suspense>
         {/* Notification */}
         {notification && (
@@ -846,7 +895,12 @@ function CalculatorArea({ showEventPageRoute = false }: { showEventPageRoute?: b
                         earnings={earnings}
                         prices={prices}
                         onOpenSettings={() => setIsSettingsOpen(true)}
+                        onOpenColumnSettings={() => setColumnModalOpen(true)}
                         onShowNotification={showNotification}
+                        visibleColumns={visibleColumns}
+                        blockDurations={blockDurations}
+                        customPeriodDays={customPeriodDays}
+                        customPeriodHours={customPeriodHours}
                       />
                     </div>
                     <div className={`tab-panel${collapsedTabs.has('simulator') ? ' collapsed' : ''}`}>
