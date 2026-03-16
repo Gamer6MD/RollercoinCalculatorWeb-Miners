@@ -28,11 +28,6 @@ function normalizeInitialUrl() {
     hash = restoredUrl.hash
   }
 
-  // Canonicalize trailing slash for non-root paths (/tr/ -> /tr)
-  if (pathname.length > 1 && pathname.endsWith('/')) {
-    pathname = pathname.replace(/\/+$/, '')
-  }
-
   const current = l.pathname + l.search + l.hash
   const target = pathname + search + hash
   if (target !== current) {

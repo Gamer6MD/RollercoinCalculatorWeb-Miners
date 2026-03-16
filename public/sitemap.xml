@@ -38,7 +38,7 @@
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/about"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/about"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/en/about"/>
   </url>
   <!-- About - English -->
   <url>
@@ -48,7 +48,7 @@
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/about"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/about"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/en/about"/>
   </url>
   <!-- Privacy - Turkish -->
   <url>
@@ -58,7 +58,7 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/privacy"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/privacy"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/en/privacy"/>
   </url>
   <!-- Privacy - English -->
   <url>
@@ -68,7 +68,7 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/privacy"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/privacy"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/en/privacy"/>
   </url>
   <!-- Event - Turkish -->
   <url>
@@ -78,7 +78,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/event"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/event"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/event"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/en/event"/>
   </url>
   <!-- Event - English -->
   <url>
@@ -88,6 +88,6 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="tr" href="https://rollercoincalculator.app/tr/event"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://rollercoincalculator.app/en/event"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/event"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rollercoincalculator.app/en/event"/>
   </url>
 </urlset>
