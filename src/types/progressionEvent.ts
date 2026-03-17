@@ -67,10 +67,19 @@ export interface ProgressionReward {
   title: LocalizedText;
   description: LocalizedText;
   range_count: { min: number; max: number };
-  item?: MinerItem | RackItem | UtilityItem | BatteryItem;
+  item?: MinerItem | RackItem | UtilityItem | BatteryItem | MutationComponentItem | MysteryBoxItem;
 }
 
-export type RewardType = 'power' | 'money' | 'season_pass_xp' | 'battery' | 'miner' | 'rack' | 'utility_item';
+export type RewardType =
+  | 'power'
+  | 'money'
+  | 'season_pass_xp'
+  | 'battery'
+  | 'miner'
+  | 'rack'
+  | 'utility_item'
+  | 'mutation_component'
+  | 'mystery_box';
 
 export interface MinerItem {
   _id: string;
@@ -110,6 +119,28 @@ export interface BatteryItem {
   description: LocalizedText;
   _id: string;
   level: number;
+}
+
+export interface MutationComponentItem {
+  _id: string;
+  name: LocalizedText;
+  rarity_group?: {
+    _id: string;
+    title: LocalizedText;
+    base_color_hex: string;
+    sort: number;
+  };
+  rarity_color_hex?: string;
+}
+
+export interface MysteryBoxItem {
+  _id: string;
+  title: LocalizedText;
+  media?: {
+    box_url?: string;
+    cover_url?: string;
+    box_image_url?: string;
+  };
 }
 
 export interface LevelConfig {

@@ -8,6 +8,8 @@ import type {
     MinerItem,
     RackItem,
     UtilityItem,
+    MutationComponentItem,
+    MysteryBoxItem,
 } from '../types/progressionEvent';
 import {
     BOX_PRICE_OPTIONS,
@@ -21,6 +23,9 @@ import batteryImg from '../assets/items/battery.png';
 import bonusPowerImg from '../assets/items/bonus_power.png';
 import xpImg from '../assets/items/xp.png';
 import speedupImg from '../assets/items/speedup_item.gif';
+import rareFanImg from '../assets/items/rare_fan.png';
+import legendaryFanImg from '../assets/items/legendary_fan.png';
+import abandonedMineChestImg from '../assets/items/Abandoned_mine_chest_d310e38e-9dea-4756-a017-cf427dc65abf.png';
 import rstImg from '../assets/coins/rst.svg';
 import rltImg from '../assets/coins/rlt.svg';
 
@@ -61,6 +66,36 @@ function getRackImageUrl(id: string): string {
     return `https://static.rollercoin.com/static/img/market/racks/${id}.png?v=1.0.4`;
 }
 
+function getMutationComponentImage(itemId: string | null, item?: MutationComponentItem): string | null {
+    if (itemId === '6196269b67433d2dc52e0130') {
+        return legendaryFanImg;
+    }
+    if (itemId === '61b35e3767433d2dc57f86a2') {
+        return rareFanImg;
+    }
+
+    const name = item?.name?.en?.toLowerCase() ?? '';
+    if (name.includes('legendary') && name.includes('fan')) {
+        return legendaryFanImg;
+    }
+    if ((name.includes('rare') && name.includes('fan')) || name.includes('hashboard')) {
+        return rareFanImg;
+    }
+
+    return null;
+}
+
+function getMutationComponentDisplayName(itemId: string | null, item?: MutationComponentItem): string {
+    if (itemId === '6196269b67433d2dc52e0130') {
+        return 'Legendary Fan';
+    }
+    if (itemId === '61b35e3767433d2dc57f86a2') {
+        return 'Rare Fan';
+    }
+
+    return item?.name?.en ?? 'Mutation Component';
+}
+
 // Get local image for known reward types
 function getRewardTypeImage(type: string): string | null {
     switch (type) {
@@ -68,9 +103,15 @@ function getRewardTypeImage(type: string): string | null {
         case 'battery': return batteryImg;
         case 'season_pass_xp': return xpImg;
         case 'utility_item': return speedupImg;
+        case 'mutation_component':
+            return rewardTypeFallbackIcon;
+        case 'mystery_box':
+            return rewardTypeFallbackIcon;
         default: return null;
     }
 }
+
+const rewardTypeFallbackIcon = xpImg;
 
 function getRewardDisplay(
     reward: ProgressionReward,
@@ -146,6 +187,24 @@ function getRewardDisplay(
                 };
             }
             return { text: t('event.rewardTypes.utilityItem'), subText: '' };
+        }
+        case 'mutation_component': {
+            const component = reward.item as MutationComponentItem | undefined;
+            const displayName = getMutationComponentDisplayName(reward.item_id, component);
+            return {
+                text: `${displayName} x${reward.amount}`,
+                subText: displayName,
+                localImage: getMutationComponentImage(reward.item_id, component) ?? undefined,
+            };
+        }
+        case 'mystery_box': {
+            const box = reward.item as MysteryBoxItem | undefined;
+            const boxTitle = box?.title?.en ?? reward.title.en;
+            return {
+                text: `${boxTitle} x${reward.amount}`,
+                subText: '',
+                localImage: abandonedMineChestImg,
+            };
         }
         default:
             return { text: reward.title.en, subText: '' };
