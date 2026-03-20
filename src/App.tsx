@@ -30,6 +30,7 @@ const ColumnSettingsModal = React.lazy(() => import('./components/ColumnSettings
 const ProgressionEvent = React.lazy(() => import('./components/ProgressionEvent'));
 const AboutPage = React.lazy(() => import('./components/AboutPage'));
 const PrivacyPage = React.lazy(() => import('./components/PrivacyPage'));
+const MergeCalculator = React.lazy(() => import('./components/MergeCalculator'));
 
 import './index.css';
 
@@ -977,6 +978,7 @@ function App() {
       <Route path="/:lang/event" element={<CalculatorArea showEventPageRoute={true} />} />
       <Route path="/:lang/about" element={<React.Suspense fallback={null}><AboutPage /></React.Suspense>} />
       <Route path="/:lang/privacy" element={<React.Suspense fallback={null}><PrivacyPage /></React.Suspense>} />
+      <Route path="/:lang/merge" element={<React.Suspense fallback={null}><MergeCalculator /></React.Suspense>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
