@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* Define custom theme colors as CSS variables */
+:root {
+  --rc-bg: #1a1b26;
+  --rc-card: #24283b;
+  --rc-border: #414868;
+  --rc-highlight: #7aa2f7;
+  --rc-text: #a9b1d6;
+  --rc-accent: #bb9af7;
+}
+
+/* Generate utility classes using the CSS variables - with !important to override global styles */
+.bg-rcBg { background-color: var(--rc-bg) !important; }
+.bg-rcCard { background-color: var(--rc-card) !important; }
+.bg-rcBorder { background-color: var(--rc-border) !important; }
+.bg-rcHighlight { background-color: var(--rc-highlight) !important; }
+
+.text-rcBg { color: var(--rc-bg) !important; }
+.text-rcCard { color: var(--rc-card) !important; }
+.text-rcBorder { color: var(--rc-border) !important; }
+.text-rcHighlight { color: var(--rc-highlight) !important; }
+.text-rcText { color: var(--rc-text) !important; }
+.text-rcAccent { color: var(--rc-accent) !important; }
+
+.border-rcBorder { border-color: var(--rc-border) !important; }
+.accent-rcHighlight { accent-color: var(--rc-highlight) !important; }
+
+/* Custom hover states */
+.hover\:bg-rcBorder:hover { background-color: var(--rc-border) !important; }
+.hover\:bg-blue-500:hover { background-color: #3b82f6 !important; }
+.hover\:text-red-300:hover { color: #fca5a5 !important; }
+.hover\:bg-gray-700\/30:hover { background-color: rgba(55, 65, 81, 0.3) !important; }
+
+/* Merge Calculator specific styles - applied to root element */
+.merge-calculator-wrapper {
+  background-color: var(--rc-bg) !important;
+  color: var(--rc-text) !important;
+  min-height: 100vh;
+}
+
+/* Loading screen */
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--rc-bg) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--rc-border) !important;
+    border-top: 4px solid var(--rc-highlight) !important;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Dual range slider */
+.dual-slider {
+    position: relative;
+    height: 24px;
+    margin: 8px 0;
+}
+
+.dual-slider-track {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background: var(--rc-border) !important;
+    border-radius: 3px;
+    width: 100%;
+    z-index: 0;
+}
+
+.dual-slider-range {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background: var(--rc-highlight) !important;
+    border-radius: 3px;
+    z-index: 1;
+}
+
+.dual-slider input[type="range"] {
+    position: absolute;
+    width: 100%;
+    pointer-events: none;
+    background: none;
+    -webkit-appearance: none;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.dual-slider input[type="range"]::-webkit-slider-thumb {
+    pointer-events: all;
+    height: 18px;
+    width: 18px;
+    -webkit-appearance: none;
+    background: var(--rc-highlight) !important;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.dual-slider input[type="range"]::-moz-range-thumb {
+    pointer-events: all;
+    height: 18px;
+    width: 18px;
+    background: var(--rc-highlight) !important;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Scrollbar - override global */
+.merge-calculator-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.merge-calculator-wrapper::-webkit-scrollbar-track {
+    background: var(--rc-bg) !important; 
+}
+.merge-calculator-wrapper::-webkit-scrollbar-thumb {
+    background: var(--rc-border) !important; 
+    border-radius: 4px;
+}
+.merge-calculator-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--rc-highlight) !important; 
+}
+
+th.sortable { 
+    cursor: pointer; 
+    user-select: none; 
+    position: relative; 
+    transition: background-color 0.2s;
+}
+th.sortable:hover { 
+    background-color: rgba(255, 255, 255, 0.05) !important; 
+}
+
+.upload-zone {
+    border: 2px dashed var(--rc-border) !important;
+    transition: all 0.3s ease;
+}
+.upload-zone.dragover {
+    border-color: var(--rc-highlight) !important;
+    background-color: rgba(122, 162, 247, 0.1) !important;
+}
